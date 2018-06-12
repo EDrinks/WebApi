@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Serilog;
 
 namespace EDrinks.WebApi
 {
@@ -10,6 +11,10 @@ namespace EDrinks.WebApi
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
+
+            Log.Logger = new LoggerConfiguration()
+                .ReadFrom.Configuration(Configuration)
+                .CreateLogger();
         }
 
         public IConfiguration Configuration { get; }

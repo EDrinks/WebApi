@@ -331,3 +331,4 @@ ASALocalRun/
 
 # misc
 *.Development.json
+logs/
