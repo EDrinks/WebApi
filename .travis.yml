@@ -3,4 +3,4 @@ solution: EDrinks/EDrinks.sln
 mono: none
 dotnet: 2.1.3
 script:
- - dotnet restore
+ - dotnet restore EDrinks/
