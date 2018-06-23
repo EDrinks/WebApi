@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using System.Linq;
+using System.Reflection;
+using MediatR;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -22,6 +25,12 @@ namespace EDrinks.WebApi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            var assemblies = Assembly.GetExecutingAssembly()
+                .GetReferencedAssemblies()
+                .Select(assemblyName => Assembly.Load(assemblyName))
+                .ToList();
+            services.AddMediatR(assemblies);
+            
             services.AddMvc();
         }
 

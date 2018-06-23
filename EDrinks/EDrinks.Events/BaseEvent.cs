@@ -2,6 +2,6 @@
 {
     public abstract class BaseEvent
     {
-        public string CreatedBy { get; set; }
+        public string CreatedBy { get; set; } = "system";
     }
 }
