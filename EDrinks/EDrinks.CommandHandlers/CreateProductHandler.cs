@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using EDrinks.Events;
 using EDrinks.Events.Products;
 using EDrinks.EventSource;
 using MediatR;
@@ -22,24 +23,27 @@ namespace EDrinks.CommandHandlers
         {
             _eventSource = eventSource;
         }
-        
+
         public async Task<bool> Handle(CreateProductCommand request, CancellationToken cancellationToken)
         {
             var productId = Guid.NewGuid();
-            
-            await _eventSource.WriteEvent(new ProductCreated()
+
+            await _eventSource.WriteEvents(new BaseEvent[]
             {
-                ProductId = productId
-            });
-            await _eventSource.WriteEvent(new ProductNameChanged()
-            {
-                ProductId = productId,
-                Name = request.Name
-            });
-            await _eventSource.WriteEvent(new ProductPriceChanged()
-            {
-                ProductId = productId,
-                Price = request.Price
+                new ProductCreated()
+                {
+                    ProductId = productId
+                },
+                new ProductNameChanged()
+                {
+                    ProductId = productId,
+                    Name = request.Name
+                },
+                new ProductPriceChanged()
+                {
+                    ProductId = productId,
+                    Price = request.Price
+                }
             });
 
             return true;

@@ -13,6 +13,8 @@ namespace EDrinks.EventSource
     public interface IEventSourceFacade
     {
         Task WriteEvent(BaseEvent evt);
+
+        Task WriteEvents(BaseEvent[] evts);
     }
 
     public class EventSourceFacade : IEventSourceFacade
@@ -29,13 +31,23 @@ namespace EDrinks.EventSource
 
         public async Task WriteEvent(BaseEvent evt)
         {
-            var metaDataStr = JsonConvert.SerializeObject(evt.MetaData);
-            var contentStr = JsonConvert.SerializeObject(evt);
+            await WriteEvents(new[] {evt});
+        }
 
-            var eventData = new EventData(Guid.NewGuid(), evt.GetEventName(), true,
-                Encoding.UTF8.GetBytes(contentStr), Encoding.UTF8.GetBytes(metaDataStr));
+        public async Task WriteEvents(BaseEvent[] evts)
+        {
+            var eventDatas = new EventData[evts.Length];
 
-            await _connection.AppendToStreamAsync("edrinks", ExpectedVersion.Any, eventData);
+            for (int i = 0; i < evts.Length; i++)
+            {
+                var metaDataStr = JsonConvert.SerializeObject(evts[i].MetaData);
+                var contentStr = JsonConvert.SerializeObject(evts[i]);
+
+                eventDatas[i] = new EventData(Guid.NewGuid(), evts[i].GetEventName(), true,
+                    Encoding.UTF8.GetBytes(contentStr), Encoding.UTF8.GetBytes(metaDataStr));
+            }
+
+            await _connection.AppendToStreamAsync("edrinks", ExpectedVersion.Any, eventDatas);
         }
     }
 }
