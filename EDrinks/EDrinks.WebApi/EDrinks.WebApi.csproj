@@ -3,6 +3,7 @@
     <TargetFramework>netcoreapp2.1</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
+    <Folder Include="Config" />
     <Folder Include="wwwroot\" />
   </ItemGroup>
   <ItemGroup>
@@ -19,5 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\EDrinks.CommandHandlers\EDrinks.CommandHandlers.csproj" />
+    <ProjectReference Include="..\EDrinks.Common\EDrinks.Common.csproj" />
+    <ProjectReference Include="..\EDrinks.EventSource\EDrinks.EventSource.csproj" />
   </ItemGroup>
 </Project>

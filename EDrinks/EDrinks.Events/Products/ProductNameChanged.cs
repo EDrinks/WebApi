@@ -7,5 +7,10 @@ namespace EDrinks.Events.Products
         public Guid ProductId { get; set; }
         
         public string Name { get; set; }
+
+        public override string GetEventName()
+        {
+            return "ProductNameChanged";
+        }
     }
 }

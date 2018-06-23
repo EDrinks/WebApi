@@ -8,6 +8,7 @@
     <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\EDrinks.EventSource\EDrinks.EventSource.csproj" />
     <ProjectReference Include="..\EDrinks.Events\EDrinks.Events.csproj" />
   </ItemGroup>
 </Project>

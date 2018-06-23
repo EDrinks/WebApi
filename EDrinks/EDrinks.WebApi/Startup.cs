@@ -1,5 +1,7 @@
 ﻿using System.Linq;
 using System.Reflection;
+using EDrinks.Common.Config;
+using EDrinks.EventSource;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -25,6 +27,9 @@ namespace EDrinks.WebApi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.Configure<EventStoreConfig>(options => Configuration.GetSection("EventStore").Bind(options));
+            services.AddSingleton<IEventSourceFacade, EventSourceFacade>();
+            
             var assemblies = Assembly.GetExecutingAssembly()
                 .GetReferencedAssemblies()
                 .Select(assemblyName => Assembly.Load(assemblyName))

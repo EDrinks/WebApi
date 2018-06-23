@@ -1,12 +1,9 @@
 ﻿using System;
-using System.Net;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using EDrinks.Events.Products;
-using EventStore.ClientAPI;
+using EDrinks.EventSource;
 using MediatR;
-using Newtonsoft.Json;
 
 namespace EDrinks.CommandHandlers
 {
@@ -19,20 +16,31 @@ namespace EDrinks.CommandHandlers
 
     public class CreateProductHandler : IRequestHandler<CreateProductCommand, bool>
     {
+        private readonly IEventSourceFacade _eventSource;
+
+        public CreateProductHandler(IEventSourceFacade eventSource)
+        {
+            _eventSource = eventSource;
+        }
+        
         public async Task<bool> Handle(CreateProductCommand request, CancellationToken cancellationToken)
         {
             var productId = Guid.NewGuid();
             
-            var connection = EventStoreConnection.Create(new IPEndPoint(IPAddress.Loopback, 1113));
-            await connection.ConnectAsync();
-
-            var jsonString = JsonConvert.SerializeObject(new ProductCreated()
+            await _eventSource.WriteEvent(new ProductCreated()
             {
                 ProductId = productId
             });
-            var myEvent = new EventData(Guid.NewGuid(), "ProductCreatedEvent", true, 
-                Encoding.UTF8.GetBytes(jsonString), null);
-            await connection.AppendToStreamAsync("edrinks", ExpectedVersion.Any, myEvent);
+            await _eventSource.WriteEvent(new ProductNameChanged()
+            {
+                ProductId = productId,
+                Name = request.Name
+            });
+            await _eventSource.WriteEvent(new ProductPriceChanged()
+            {
+                ProductId = productId,
+                Price = request.Price
+            });
 
             return true;
         }
