@@ -10,6 +10,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EDrinks.EventSource", "EDri
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EDrinks.Common", "EDrinks.Common\EDrinks.Common.csproj", "{E0C1B4BB-9231-400D-A7E1-2D64792B6FC9}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EDrinks.QueryHandlers", "EDrinks.QueryHandlers\EDrinks.QueryHandlers.csproj", "{A8FEC45E-BBD3-4149-A61F-55CE04A4DC99}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -36,5 +38,9 @@ Global
 		{E0C1B4BB-9231-400D-A7E1-2D64792B6FC9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E0C1B4BB-9231-400D-A7E1-2D64792B6FC9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E0C1B4BB-9231-400D-A7E1-2D64792B6FC9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A8FEC45E-BBD3-4149-A61F-55CE04A4DC99}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A8FEC45E-BBD3-4149-A61F-55CE04A4DC99}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A8FEC45E-BBD3-4149-A61F-55CE04A4DC99}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A8FEC45E-BBD3-4149-A61F-55CE04A4DC99}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

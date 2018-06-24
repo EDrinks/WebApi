@@ -19,6 +19,8 @@ namespace EDrinks.EventSource
 
     public class EventSourceFacade : IEventSourceFacade
     {
+        private static readonly string STREAM = "edrinks";
+
         private IEventStoreConnection _connection;
 
         public EventSourceFacade(IOptions<EventStoreConfig> options)
@@ -27,6 +29,9 @@ namespace EDrinks.EventSource
                 EventStoreConnection.Create(
                     new IPEndPoint(IPAddress.Parse(options.Value.IPAddress), options.Value.Port));
             _connection.ConnectAsync().Wait();
+
+            _connection.SubscribeToStreamFrom(STREAM, StreamCheckpoint.StreamStart, 
+                new CatchUpSubscriptionSettings(500, 20, false, false), EventAppeared);
         }
 
         public async Task WriteEvent(BaseEvent evt)
@@ -47,7 +52,14 @@ namespace EDrinks.EventSource
                     Encoding.UTF8.GetBytes(contentStr), Encoding.UTF8.GetBytes(metaDataStr));
             }
 
-            await _connection.AppendToStreamAsync("edrinks", ExpectedVersion.Any, eventDatas);
+            await _connection.AppendToStreamAsync(STREAM, ExpectedVersion.Any, eventDatas);
+        }
+
+        private async Task EventAppeared(EventStoreCatchUpSubscription subscription, ResolvedEvent resolvedEvent)
+        {
+            var data = Encoding.UTF8.GetString(resolvedEvent.Event.Data);
+            Console.WriteLine("Received: " + resolvedEvent.Event.EventStreamId + ":" + resolvedEvent.Event.EventNumber);
+            Console.WriteLine(data);
         }
     }
 }
