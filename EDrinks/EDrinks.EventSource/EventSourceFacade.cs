@@ -19,12 +19,14 @@ namespace EDrinks.EventSource
 
     public class EventSourceFacade : IEventSourceFacade
     {
+        private readonly IEventLookup _eventLookup;
         private static readonly string STREAM = "edrinks";
 
         private IEventStoreConnection _connection;
 
-        public EventSourceFacade(IOptions<EventStoreConfig> options)
+        public EventSourceFacade(IOptions<EventStoreConfig> options, IEventLookup eventLookup)
         {
+            _eventLookup = eventLookup;
             _connection =
                 EventStoreConnection.Create(
                     new IPEndPoint(IPAddress.Parse(options.Value.IPAddress), options.Value.Port));
@@ -48,7 +50,7 @@ namespace EDrinks.EventSource
                 var metaDataStr = JsonConvert.SerializeObject(evts[i].MetaData);
                 var contentStr = JsonConvert.SerializeObject(evts[i]);
 
-                eventDatas[i] = new EventData(Guid.NewGuid(), evts[i].GetEventName(), true,
+                eventDatas[i] = new EventData(Guid.NewGuid(), evts[i].GetType().Name, true,
                     Encoding.UTF8.GetBytes(contentStr), Encoding.UTF8.GetBytes(metaDataStr));
             }
 
@@ -60,6 +62,12 @@ namespace EDrinks.EventSource
             var data = Encoding.UTF8.GetString(resolvedEvent.Event.Data);
             Console.WriteLine("Received: " + resolvedEvent.Event.EventStreamId + ":" + resolvedEvent.Event.EventNumber);
             Console.WriteLine(data);
+
+            Type eventType = _eventLookup.GetType(resolvedEvent.Event.EventType);
+            if (eventType != null)
+            {
+                var obj = JsonConvert.DeserializeObject(data, eventType);
+            }
         }
     }
 }

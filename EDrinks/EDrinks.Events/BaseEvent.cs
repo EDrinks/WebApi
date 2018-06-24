@@ -11,8 +11,6 @@ namespace EDrinks.Events
         {
             MetaData = new MetaData();
         }
-
-        public abstract string GetEventName();
     }
 
     public class MetaData

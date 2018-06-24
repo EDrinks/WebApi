@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using System.Reflection;
 using EDrinks.Common.Config;
+using EDrinks.Events;
 using EDrinks.EventSource;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
@@ -29,6 +30,7 @@ namespace EDrinks.WebApi
         {
             services.Configure<EventStoreConfig>(options => Configuration.GetSection("EventStore").Bind(options));
             services.AddSingleton<IEventSourceFacade, EventSourceFacade>();
+            services.AddSingleton<IEventLookup, EventLookup>();
             
             var assemblies = Assembly.GetExecutingAssembly()
                 .GetReferencedAssemblies()
