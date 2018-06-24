@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
@@ -15,6 +16,8 @@ namespace EDrinks.EventSource
         Task WriteEvent(BaseEvent evt);
 
         Task WriteEvents(BaseEvent[] evts);
+
+        void Subscribe(Func<BaseEvent, Task> callback);
     }
 
     public class EventSourceFacade : IEventSourceFacade
@@ -31,9 +34,6 @@ namespace EDrinks.EventSource
                 EventStoreConnection.Create(
                     new IPEndPoint(IPAddress.Parse(options.Value.IPAddress), options.Value.Port));
             _connection.ConnectAsync().Wait();
-
-            _connection.SubscribeToStreamFrom(STREAM, StreamCheckpoint.StreamStart, 
-                new CatchUpSubscriptionSettings(500, 20, false, false), EventAppeared);
         }
 
         public async Task WriteEvent(BaseEvent evt)
@@ -57,16 +57,28 @@ namespace EDrinks.EventSource
             await _connection.AppendToStreamAsync(STREAM, ExpectedVersion.Any, eventDatas);
         }
 
+        public void Subscribe(Func<BaseEvent, Task> callback)
+        {
+            _connection.SubscribeToStreamFrom(STREAM, StreamCheckpoint.StreamStart,
+                new CatchUpSubscriptionSettings(500, 20, false, false), async (subscription, resolvedEvent) =>
+                {
+                    var data = Encoding.UTF8.GetString(resolvedEvent.Event.Data);
+                    Type eventType = _eventLookup.GetType(resolvedEvent.Event.EventType);
+                    if (eventType != null)
+                    {
+                        var obj = (BaseEvent) JsonConvert.DeserializeObject(data, eventType);
+                        await callback(obj);
+                    }
+                });
+        }
+
         private async Task EventAppeared(EventStoreCatchUpSubscription subscription, ResolvedEvent resolvedEvent)
         {
             var data = Encoding.UTF8.GetString(resolvedEvent.Event.Data);
-            Console.WriteLine("Received: " + resolvedEvent.Event.EventStreamId + ":" + resolvedEvent.Event.EventNumber);
-            Console.WriteLine(data);
-
             Type eventType = _eventLookup.GetType(resolvedEvent.Event.EventType);
             if (eventType != null)
             {
-                var obj = JsonConvert.DeserializeObject(data, eventType);
+                var obj = (BaseEvent) JsonConvert.DeserializeObject(data, eventType);
             }
         }
     }

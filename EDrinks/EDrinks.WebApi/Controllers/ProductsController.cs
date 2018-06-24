@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using EDrinks.CommandHandlers;
+using EDrinks.QueryHandlers;
 using EDrinks.WebApi.Attributes;
 using EDrinks.WebApi.Dtos;
 using MediatR;
@@ -20,7 +21,9 @@ namespace EDrinks.WebApi.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
-            return null;
+            var products = await _mediator.Send(new GetProductsQuery());
+            
+            return Ok(products);
         }
 
         [HttpPost]

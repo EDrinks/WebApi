@@ -6,4 +6,7 @@
     <ProjectReference Include="..\EDrinks.EventSource\EDrinks.EventSource.csproj" />
     <ProjectReference Include="..\EDrinks.Events\EDrinks.Events.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="MediatR" Version="5.0.1" />
+  </ItemGroup>
 </Project>

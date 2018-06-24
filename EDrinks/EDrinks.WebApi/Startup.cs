@@ -3,6 +3,7 @@ using System.Reflection;
 using EDrinks.Common.Config;
 using EDrinks.Events;
 using EDrinks.EventSource;
+using EDrinks.QueryHandlers;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -31,19 +32,22 @@ namespace EDrinks.WebApi
             services.Configure<EventStoreConfig>(options => Configuration.GetSection("EventStore").Bind(options));
             services.AddSingleton<IEventSourceFacade, EventSourceFacade>();
             services.AddSingleton<IEventLookup, EventLookup>();
-            
+            services.AddSingleton<IReadModel, ReadModel>();
+
             var assemblies = Assembly.GetExecutingAssembly()
                 .GetReferencedAssemblies()
                 .Select(assemblyName => Assembly.Load(assemblyName))
                 .ToList();
             services.AddMediatR(assemblies);
-            
+
             services.AddMvc();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, IReadModel readModel)
         {
+            readModel.Init();
+            
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();

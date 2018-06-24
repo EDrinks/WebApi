@@ -22,5 +22,6 @@
     <ProjectReference Include="..\EDrinks.CommandHandlers\EDrinks.CommandHandlers.csproj" />
     <ProjectReference Include="..\EDrinks.Common\EDrinks.Common.csproj" />
     <ProjectReference Include="..\EDrinks.EventSource\EDrinks.EventSource.csproj" />
+    <ProjectReference Include="..\EDrinks.QueryHandlers\EDrinks.QueryHandlers.csproj" />
   </ItemGroup>
 </Project>
