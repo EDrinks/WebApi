@@ -30,8 +30,9 @@ namespace EDrinks.EventSource
         public EventSourceFacade(IOptions<EventStoreConfig> options, IEventLookup eventLookup)
         {
             _eventLookup = eventLookup;
+            var settings = ConnectionSettings.Create();
             _connection =
-                EventStoreConnection.Create(
+                EventStoreConnection.Create(settings,
                     new IPEndPoint(IPAddress.Parse(options.Value.IPAddress), options.Value.Port));
             _connection.ConnectAsync().Wait();
         }
@@ -59,17 +60,29 @@ namespace EDrinks.EventSource
 
         public void Subscribe(Func<BaseEvent, Task> callback)
         {
-            _connection.SubscribeToStreamFrom(STREAM, StreamCheckpoint.StreamStart,
-                new CatchUpSubscriptionSettings(500, 20, false, false), async (subscription, resolvedEvent) =>
+            async Task Appeared(EventStoreCatchUpSubscription subscription, ResolvedEvent resolvedEvent)
+            {
+                var data = Encoding.UTF8.GetString(resolvedEvent.Event.Data);
+                Type eventType = _eventLookup.GetType(resolvedEvent.Event.EventType);
+                if (eventType != null)
                 {
-                    var data = Encoding.UTF8.GetString(resolvedEvent.Event.Data);
-                    Type eventType = _eventLookup.GetType(resolvedEvent.Event.EventType);
-                    if (eventType != null)
+                    var obj = (BaseEvent) JsonConvert.DeserializeObject(data, eventType);
+                    await callback(obj);
+                }
+            }
+
+            void SubscribeToStream(Func<BaseEvent, Task> callback1)
+            {
+                _connection.SubscribeToStreamFrom(STREAM, StreamCheckpoint.StreamStart,
+                    CatchUpSubscriptionSettings.Default, Appeared,
+                    subscriptionDropped: (subscription, reason, exception) =>
                     {
-                        var obj = (BaseEvent) JsonConvert.DeserializeObject(data, eventType);
-                        await callback(obj);
-                    }
-                });
+                        subscription.Stop();
+                        SubscribeToStream(callback1);
+                    });
+            }
+            
+            SubscribeToStream(callback);
         }
 
         private async Task EventAppeared(EventStoreCatchUpSubscription subscription, ResolvedEvent resolvedEvent)
