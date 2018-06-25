@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using EDrinks.CommandHandlers;
 using EDrinks.QueryHandlers;
 using EDrinks.WebApi.Attributes;
@@ -12,10 +13,12 @@ namespace EDrinks.WebApi.Controllers
     public class ProductsController : Controller
     {
         private readonly IMediator _mediator;
+        private readonly IReadModel _readModel;
 
-        public ProductsController(IMediator mediator)
+        public ProductsController(IMediator mediator, IReadModel readModel)
         {
             _mediator = mediator;
+            _readModel = readModel;
         }
 
         [HttpGet]
@@ -38,6 +41,24 @@ namespace EDrinks.WebApi.Controllers
 
             if (!result) return StatusCode(500);
 
+            return Ok();
+        }
+
+        [HttpDelete("{productId}")]
+        public async Task<IActionResult> DeleteProduct([FromRoute] Guid productId)
+        {
+            if (!_readModel.Products.ContainsKey(productId))
+            {
+                return NotFound();
+            }
+
+            var result = await _mediator.Send(new DeleteProductCommand()
+            {
+                ProductId = productId
+            });
+
+            if (!result) return StatusCode(500);
+            
             return Ok();
         }
     }

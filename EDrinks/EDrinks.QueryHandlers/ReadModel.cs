@@ -48,6 +48,9 @@ namespace EDrinks.QueryHandlers
                 case ProductPriceChanged pcc:
                     Products[pcc.ProductId].Apply(pcc);
                     break;
+                case ProductDeleted pd:
+                    Products.Remove(pd.ProductId);
+                    break;
             }
         }
     }
