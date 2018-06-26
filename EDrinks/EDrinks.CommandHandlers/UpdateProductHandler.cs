@@ -1,14 +1,13 @@
 ﻿using System;
-using System.Threading;
 using System.Threading.Tasks;
+using EDrinks.Common;
 using EDrinks.Events;
 using EDrinks.Events.Products;
 using EDrinks.EventSource;
-using MediatR;
 
 namespace EDrinks.CommandHandlers
 {
-    public class UpdateProductCommand : IRequest<bool>
+    public class UpdateProductCommand : ICommandRequest
     {
         public Guid ProductId { get; set; }
 
@@ -17,7 +16,7 @@ namespace EDrinks.CommandHandlers
         public decimal ProductPrice { get; set; }
     }
 
-    public class UpdateProductHandler : IRequestHandler<UpdateProductCommand, bool>
+    public class UpdateProductHandler : CommandHandler<UpdateProductCommand>
     {
         private readonly IEventSourceFacade _eventSource;
 
@@ -26,7 +25,7 @@ namespace EDrinks.CommandHandlers
             _eventSource = eventSource;
         }
 
-        public async Task<bool> Handle(UpdateProductCommand request, CancellationToken cancellationToken)
+        protected override async Task<HandlerResult> DoHandle(UpdateProductCommand request)
         {
             await _eventSource.WriteEvents(new BaseEvent[]
             {
@@ -42,7 +41,7 @@ namespace EDrinks.CommandHandlers
                 }
             });
 
-            return true;
+            return Ok();
         }
     }
 }

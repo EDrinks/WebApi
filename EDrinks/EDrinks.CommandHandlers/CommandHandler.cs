@@ -14,5 +14,15 @@ namespace EDrinks.CommandHandlers
         }
 
         protected abstract Task<HandlerResult> DoHandle(TRequest request);
+
+        protected HandlerResult Ok()
+        {
+            return new HandlerResult() {ResultCode = ResultCode.Ok};
+        }
+
+        protected HandlerResult Error()
+        {
+            return new HandlerResult() {ResultCode = ResultCode.Error};
+        }
     }
 }

@@ -1,18 +1,17 @@
 ﻿using System;
-using System.Threading;
 using System.Threading.Tasks;
+using EDrinks.Common;
 using EDrinks.Events.Products;
 using EDrinks.EventSource;
-using MediatR;
 
 namespace EDrinks.CommandHandlers
 {
-    public class DeleteProductCommand : IRequest<bool>
+    public class DeleteProductCommand : ICommandRequest
     {
         public Guid ProductId { get; set; }
     }
     
-    public class DeleteProductHandler : IRequestHandler<DeleteProductCommand, bool>
+    public class DeleteProductHandler : CommandHandler<DeleteProductCommand>
     {
         private readonly IEventSourceFacade _eventSource;
 
@@ -21,14 +20,14 @@ namespace EDrinks.CommandHandlers
             _eventSource = eventSource;
         }
         
-        public async Task<bool> Handle(DeleteProductCommand request, CancellationToken cancellationToken)
+        protected override async Task<HandlerResult> DoHandle(DeleteProductCommand request)
         {
             await _eventSource.WriteEvent(new ProductDeleted()
             {
                 ProductId = request.ProductId
             });
             
-            return true;
+            return Ok();
         }
     }
 }

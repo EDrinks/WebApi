@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
 using EDrinks.CommandHandlers;
-using EDrinks.Common;
 using EDrinks.QueryHandlers;
 using EDrinks.WebApi.Attributes;
 using EDrinks.WebApi.Dtos;
@@ -59,9 +58,7 @@ namespace EDrinks.WebApi.Controllers
                 ProductPrice = productDto.Price
             });
 
-            if (!result) return StatusCode(500);
-            
-            return Ok();
+            return ResultToResponse(result);
         }
 
         [HttpDelete("{productId}")]
@@ -77,9 +74,7 @@ namespace EDrinks.WebApi.Controllers
                 ProductId = productId
             });
 
-            if (!result) return StatusCode(500);
-            
-            return Ok();
+            return ResultToResponse(result);
         }
     }
 }

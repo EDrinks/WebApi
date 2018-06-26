@@ -45,10 +45,7 @@ namespace EDrinks.CommandHandlers
                 }
             });
 
-            return new HandlerResult()
-            {
-                ResultCode = ResultCode.Ok
-            };
+            return Ok();
         }
     }
 }
