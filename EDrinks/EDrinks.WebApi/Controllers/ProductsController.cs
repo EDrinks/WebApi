@@ -24,9 +24,9 @@ namespace EDrinks.WebApi.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
-            var products = await _mediator.Send(new GetProductsQuery());
-            
-            return Ok(products);
+            var result = await _mediator.Send(new GetProductsQuery());
+
+            return ResultToResponse(result);
         }
 
         [HttpPost]

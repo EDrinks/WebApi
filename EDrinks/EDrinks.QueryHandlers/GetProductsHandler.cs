@@ -1,17 +1,16 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
+using EDrinks.Common;
 using EDrinks.QueryHandlers.Model;
-using MediatR;
 
 namespace EDrinks.QueryHandlers
 {
-    public class GetProductsQuery : IRequest<List<Product>>
+    public class GetProductsQuery : IQueryRequest<List<Product>>
     {
     }
 
-    public class GetProductsHandler : IRequestHandler<GetProductsQuery, List<Product>>
+    public class GetProductsHandler : QueryHandler<GetProductsQuery, List<Product>>
     {
         private readonly IReadModel _readModel;
 
@@ -19,10 +18,10 @@ namespace EDrinks.QueryHandlers
         {
             _readModel = readModel;
         }
-        
-        public async Task<List<Product>> Handle(GetProductsQuery request, CancellationToken cancellationToken)
+
+        protected override async Task<HandlerResult<List<Product>>> DoHandle(GetProductsQuery request)
         {
-            return _readModel.Products.Values.ToList();
+            return Ok(_readModel.Products.Values.ToList());
         }
     }
 }

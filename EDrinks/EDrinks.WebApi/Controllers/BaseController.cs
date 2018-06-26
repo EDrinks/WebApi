@@ -17,5 +17,18 @@ namespace EDrinks.WebApi.Controllers
                     return StatusCode(500);
             }
         }
+        
+        protected IActionResult ResultToResponse<TReturn>(HandlerResult<TReturn> handlerResult)
+        {
+            switch (handlerResult.ResultCode)
+            {
+                case ResultCode.Ok:
+                    return Ok(handlerResult.Payload);
+                case ResultCode.Error:
+                    return StatusCode(500);
+                default:
+                    return StatusCode(500);
+            }
+        }
     }
 }
