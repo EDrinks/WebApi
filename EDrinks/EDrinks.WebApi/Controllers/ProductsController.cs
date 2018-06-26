@@ -31,16 +31,37 @@ namespace EDrinks.WebApi.Controllers
 
         [HttpPost]
         [ValidateModel]
-        public async Task<IActionResult> CreateProduct([FromBody] CreateProduct createProduct)
+        public async Task<IActionResult> CreateProduct([FromBody] ProductDto productDto)
         {
             var result = await _mediator.Send(new CreateProductCommand()
             {
-                Name = createProduct.Name,
-                Price = createProduct.Price
+                Name = productDto.Name,
+                Price = productDto.Price
             });
 
             if (!result) return StatusCode(500);
 
+            return Ok();
+        }
+
+        [HttpPut("{productId}")]
+        [ValidateModel]
+        public async Task<IActionResult> UpdateProduct([FromRoute] Guid productId, [FromBody] ProductDto productDto)
+        {
+            if (!_readModel.Products.ContainsKey(productId))
+            {
+                return NotFound();
+            }
+
+            var result = await _mediator.Send(new UpdateProductCommand()
+            {
+                ProductId = productId,
+                ProductName = productDto.Name,
+                ProductPrice = productDto.Price
+            });
+
+            if (!result) return StatusCode(500);
+            
             return Ok();
         }
 

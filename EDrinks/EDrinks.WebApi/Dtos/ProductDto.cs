@@ -2,7 +2,7 @@
 
 namespace EDrinks.WebApi.Dtos
 {
-    public class CreateProduct
+    public class ProductDto
     {
         [Required]
         [StringLength(50, MinimumLength = 3)]
