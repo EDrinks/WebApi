@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using EDrinks.CommandHandlers;
+using EDrinks.Common;
 using EDrinks.QueryHandlers;
 using EDrinks.WebApi.Attributes;
 using EDrinks.WebApi.Dtos;
@@ -10,7 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace EDrinks.WebApi.Controllers
 {
     [Route("api/[controller]")]
-    public class ProductsController : Controller
+    public class ProductsController : BaseController
     {
         private readonly IMediator _mediator;
         private readonly IReadModel _readModel;
@@ -39,9 +40,7 @@ namespace EDrinks.WebApi.Controllers
                 Price = productDto.Price
             });
 
-            if (!result) return StatusCode(500);
-
-            return Ok();
+            return ResultToResponse(result);
         }
 
         [HttpPut("{productId}")]

@@ -1,21 +1,20 @@
 ﻿using System;
-using System.Threading;
 using System.Threading.Tasks;
+using EDrinks.Common;
 using EDrinks.Events;
 using EDrinks.Events.Products;
 using EDrinks.EventSource;
-using MediatR;
 
 namespace EDrinks.CommandHandlers
 {
-    public class CreateProductCommand : IRequest<bool>
+    public class CreateProductCommand : ICommandRequest
     {
         public string Name { get; set; }
 
         public decimal Price { get; set; }
     }
 
-    public class CreateProductHandler : IRequestHandler<CreateProductCommand, bool>
+    public class CreateProductHandler : CommandHandler<CreateProductCommand>
     {
         private readonly IEventSourceFacade _eventSource;
 
@@ -24,7 +23,7 @@ namespace EDrinks.CommandHandlers
             _eventSource = eventSource;
         }
 
-        public async Task<bool> Handle(CreateProductCommand request, CancellationToken cancellationToken)
+        protected override async Task<HandlerResult> DoHandle(CreateProductCommand request)
         {
             var productId = Guid.NewGuid();
 
@@ -46,7 +45,10 @@ namespace EDrinks.CommandHandlers
                 }
             });
 
-            return true;
+            return new HandlerResult()
+            {
+                ResultCode = ResultCode.Ok
+            };
         }
     }
 }
