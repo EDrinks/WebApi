@@ -23,13 +23,16 @@ namespace EDrinks.EventSource
     public class EventSourceFacade : IEventSourceFacade
     {
         private readonly IEventLookup _eventLookup;
-        private static readonly string STREAM = "edrinks";
+        private readonly string _stream;
 
         private IEventStoreConnection _connection;
 
         public EventSourceFacade(IOptions<EventStoreConfig> options, IEventLookup eventLookup)
         {
             _eventLookup = eventLookup;
+
+            _stream = options.Value.Stream;
+            
             var settings = ConnectionSettings.Create();
             _connection =
                 EventStoreConnection.Create(settings,
@@ -55,7 +58,7 @@ namespace EDrinks.EventSource
                     Encoding.UTF8.GetBytes(contentStr), Encoding.UTF8.GetBytes(metaDataStr));
             }
 
-            await _connection.AppendToStreamAsync(STREAM, ExpectedVersion.Any, eventDatas);
+            await _connection.AppendToStreamAsync(_stream, ExpectedVersion.Any, eventDatas);
         }
 
         public void Subscribe(Func<BaseEvent, Task> callback)
@@ -73,7 +76,7 @@ namespace EDrinks.EventSource
 
             void SubscribeToStream(Func<BaseEvent, Task> callback1)
             {
-                _connection.SubscribeToStreamFrom(STREAM, StreamCheckpoint.StreamStart,
+                _connection.SubscribeToStreamFrom(_stream, StreamCheckpoint.StreamStart,
                     CatchUpSubscriptionSettings.Default, Appeared,
                     subscriptionDropped: (subscription, reason, exception) =>
                     {
