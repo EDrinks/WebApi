@@ -10,8 +10,6 @@ namespace EDrinks.QueryHandlers
 {
     public interface IReadModel
     {
-        void Init();
-        
         Dictionary<Guid, Product> Products { get; }
     }
 
@@ -24,13 +22,9 @@ namespace EDrinks.QueryHandlers
         public ReadModel(IEventSourceFacade facade)
         {
             _facade = facade;
+            _facade.Subscribe(EventAppeared);
             
             Products = new Dictionary<Guid, Product>();
-        }
-
-        public void Init()
-        {
-            _facade.Subscribe(EventAppeared);
         }
 
         private async Task EventAppeared(BaseEvent evt)
