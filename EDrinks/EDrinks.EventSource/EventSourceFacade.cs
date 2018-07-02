@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
@@ -86,16 +85,6 @@ namespace EDrinks.EventSource
             }
             
             SubscribeToStream(callback);
-        }
-
-        private async Task EventAppeared(EventStoreCatchUpSubscription subscription, ResolvedEvent resolvedEvent)
-        {
-            var data = Encoding.UTF8.GetString(resolvedEvent.Event.Data);
-            Type eventType = _eventLookup.GetType(resolvedEvent.Event.EventType);
-            if (eventType != null)
-            {
-                var obj = (BaseEvent) JsonConvert.DeserializeObject(data, eventType);
-            }
         }
     }
 }

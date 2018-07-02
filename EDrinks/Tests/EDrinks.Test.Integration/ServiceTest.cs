@@ -1,6 +1,10 @@
-﻿using System.Net.Http;
+﻿using System;
+using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Text;
 using System.Threading.Tasks;
+using EDrinks.Events;
+using EventStore.ClientAPI;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Xunit;
@@ -32,11 +36,27 @@ namespace EDrinks.Test.Integration
             var jsonContent = JsonConvert.SerializeObject(data);
 
             var buffer = System.Text.Encoding.UTF8.GetBytes(jsonContent);
-            
+
             var byteContent = new ByteArrayContent(buffer);
             byteContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
 
             return byteContent;
+        }
+
+        protected void DeleteStream()
+        {
+            _fixture.Connection.DeleteStreamAsync(_fixture.Stream, ExpectedVersion.Any, false).Wait();
+        }
+
+        protected async Task WriteToStream(BaseEvent evt)
+        {
+            var metaDataStr = JsonConvert.SerializeObject(evt.MetaData);
+            var contentStr = JsonConvert.SerializeObject(evt);
+
+            var eventData = new EventData(Guid.NewGuid(), evt.GetType().Name, true,
+                Encoding.UTF8.GetBytes(contentStr), Encoding.UTF8.GetBytes(metaDataStr));
+
+            await _fixture.Connection.AppendToStreamAsync(_fixture.Stream, ExpectedVersion.Any, eventData);
         }
     }
 }
