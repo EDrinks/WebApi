@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using EDrinks.Common;
 using EDrinks.Events;
 using EDrinks.Events.Products;
 using EDrinks.EventSource;
 using EDrinks.QueryHandlers.Model;
+using EventStore.ClientAPI;
 
 namespace EDrinks.QueryHandlers
 {
@@ -15,14 +17,15 @@ namespace EDrinks.QueryHandlers
 
     public class ReadModel : IReadModel
     {
-        private readonly IEventSourceFacade _facade;
+        private readonly IEventStoreConnection _connection;
+        private readonly IStreamResolver _streamResolver;
 
-        public Dictionary<Guid, Product> Products { get; }
+        public Dictionary<Guid, Product> Products { get; set; }
 
-        public ReadModel(IEventSourceFacade facade)
+        public ReadModel(IEventStoreConnection connection, IStreamResolver streamResolver)
         {
-            _facade = facade;
-            _facade.Subscribe(EventAppeared);
+            _connection = connection;
+            _streamResolver = streamResolver;
             
             Products = new Dictionary<Guid, Product>();
         }

@@ -1,9 +1,13 @@
 ﻿using System.Linq;
+using System.Net;
 using System.Reflection;
+using EDrinks.Common;
 using EDrinks.Common.Config;
 using EDrinks.Events;
 using EDrinks.EventSource;
 using EDrinks.QueryHandlers;
+using EDrinks.WebApi.Services;
+using EventStore.ClientAPI;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -30,9 +34,21 @@ namespace EDrinks.WebApi
         public void ConfigureServices(IServiceCollection services)
         {
             services.Configure<EventStoreConfig>(options => Configuration.GetSection("EventStore").Bind(options));
-            services.AddSingleton<IEventSourceFacade, EventSourceFacade>();
+
+            services.AddScoped<IStreamResolver, StreamResolver>();
+            services.AddSingleton<IEventStoreConnection>(serviceProvider =>
+            {
+                var settings = ConnectionSettings.Create();
+                var connection = EventStoreConnection.Create(settings, new IPEndPoint(
+                    IPAddress.Parse(Configuration.GetValue<string>("EventStore:IPAddress")),
+                    Configuration.GetValue<int>("EventStore:Port")));
+                connection.ConnectAsync().Wait();
+
+                return connection;
+            });
+            services.AddScoped<IEventSourceFacade, EventSourceFacade>();
+            services.AddScoped<IReadModel, ReadModel>();
             services.AddSingleton<IEventLookup, EventLookup>();
-            services.AddSingleton<IReadModel, ReadModel>();
 
             var assemblies = Assembly.GetExecutingAssembly()
                 .GetReferencedAssemblies()

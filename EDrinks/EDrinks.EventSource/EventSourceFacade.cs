@@ -2,6 +2,7 @@
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using EDrinks.Common;
 using EDrinks.Common.Config;
 using EDrinks.Events;
 using EventStore.ClientAPI;
@@ -22,21 +23,18 @@ namespace EDrinks.EventSource
     public class EventSourceFacade : IEventSourceFacade
     {
         private readonly IEventLookup _eventLookup;
-        private readonly string _stream;
+
+        private readonly IStreamResolver _streamResolver;
+//        private readonly string _stream;
 
         private IEventStoreConnection _connection;
 
-        public EventSourceFacade(IOptions<EventStoreConfig> options, IEventLookup eventLookup)
+        public EventSourceFacade(IEventStoreConnection connection, IEventLookup eventLookup,
+            IStreamResolver streamResolver)
         {
             _eventLookup = eventLookup;
-
-            _stream = options.Value.Stream;
-            
-            var settings = ConnectionSettings.Create();
-            _connection =
-                EventStoreConnection.Create(settings,
-                    new IPEndPoint(IPAddress.Parse(options.Value.IPAddress), options.Value.Port));
-            _connection.ConnectAsync().Wait();
+            _streamResolver = streamResolver;
+            _connection = connection;
         }
 
         public async Task WriteEvent(BaseEvent evt)
@@ -57,7 +55,7 @@ namespace EDrinks.EventSource
                     Encoding.UTF8.GetBytes(contentStr), Encoding.UTF8.GetBytes(metaDataStr));
             }
 
-            await _connection.AppendToStreamAsync(_stream, ExpectedVersion.Any, eventDatas);
+            await _connection.AppendToStreamAsync(_streamResolver.GetStream(), ExpectedVersion.Any, eventDatas);
         }
 
         public void Subscribe(Func<BaseEvent, Task> callback)
@@ -75,7 +73,7 @@ namespace EDrinks.EventSource
 
             void SubscribeToStream(Func<BaseEvent, Task> callback1)
             {
-                _connection.SubscribeToStreamFrom(_stream, StreamCheckpoint.StreamStart,
+                _connection.SubscribeToStreamFrom(_streamResolver.GetStream(), StreamCheckpoint.StreamStart,
                     CatchUpSubscriptionSettings.Default, Appeared,
                     subscriptionDropped: (subscription, reason, exception) =>
                     {

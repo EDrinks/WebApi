@@ -24,7 +24,7 @@ namespace EDrinks.Test.Integration.Endpoints.ProductsController
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
             var content = await Deserialize<List<Product>>(response);
-            Assert.Equal(0, content.Count);
+            Assert.Empty(content);
         }
 
         [Fact]

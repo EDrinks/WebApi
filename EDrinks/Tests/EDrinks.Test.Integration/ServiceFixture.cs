@@ -19,6 +19,7 @@ namespace EDrinks.Test.Integration
 
         public ServiceFixture()
         {
+            //(new CustomWebApplicationFactory()).CreateClient();
             var testServer = new TestServer(WebHost.CreateDefaultBuilder()
                 .UseStartup<Startup>());
             Client = testServer.CreateClient();
