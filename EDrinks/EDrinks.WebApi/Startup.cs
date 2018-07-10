@@ -50,10 +50,8 @@ namespace EDrinks.WebApi
             services.AddScoped<IReadModel, ReadModel>();
             services.AddSingleton<IEventLookup, EventLookup>();
 
-            var assemblies = Assembly.GetExecutingAssembly()
-                .GetReferencedAssemblies()
-                .Select(assemblyName => Assembly.Load(assemblyName))
-                .ToList();
+            var assemblies = (new[] {"EDrinks.QueryHandlers", "EDrinks.CommandHandlers"})
+                .Select(assemblyName => Assembly.Load(assemblyName));
             services.AddMediatR(assemblies);
 
             services.AddMvc();
