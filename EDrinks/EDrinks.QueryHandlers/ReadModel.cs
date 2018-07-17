@@ -14,7 +14,6 @@ namespace EDrinks.QueryHandlers
 {
     public interface IReadModel
     {
-        Dictionary<Guid, Product> Products { get; }
         Task<List<Product>> GetProducts();
     }
 

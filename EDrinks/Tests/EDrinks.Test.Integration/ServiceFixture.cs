@@ -16,7 +16,7 @@ namespace EDrinks.Test.Integration
     public class ServiceFixture : IDisposable
     {
         public IEventStoreConnection Connection;
-        public string Stream;
+        public IStreamResolver StreamResolver;
         public HttpClient Client { get; set; }
 
         public ServiceFixture()
@@ -25,14 +25,14 @@ namespace EDrinks.Test.Integration
                 .UseStartup<Startup>()
                 .ConfigureTestServices(services => { services.AddScoped<IStreamResolver, TestStreamResolver>(); }));
             Client = testServer.CreateClient();
-
+            
             var configuration = new ConfigurationBuilder()
                 .AddJsonFile("appsettings.json")
                 .Build();
 
             var ipAddress = configuration.GetValue<string>("EventStore:IPAddress");
             var port = configuration.GetValue<int>("EventStore:Port");
-            Stream = configuration.GetValue<string>("EventStore:Stream");
+            StreamResolver = new TestStreamResolver();
 
             var settings = ConnectionSettings.Create();
             Connection =

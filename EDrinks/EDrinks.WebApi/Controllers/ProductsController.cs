@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using EDrinks.CommandHandlers;
 using EDrinks.QueryHandlers;
@@ -46,7 +47,7 @@ namespace EDrinks.WebApi.Controllers
         [ValidateModel]
         public async Task<IActionResult> UpdateProduct([FromRoute] Guid productId, [FromBody] ProductDto productDto)
         {
-            if (!_readModel.Products.ContainsKey(productId))
+            if ((await _readModel.GetProducts()).All(e => e.Id != productId))
             {
                 return NotFound();
             }
@@ -64,7 +65,7 @@ namespace EDrinks.WebApi.Controllers
         [HttpDelete("{productId}")]
         public async Task<IActionResult> DeleteProduct([FromRoute] Guid productId)
         {
-            if (!_readModel.Products.ContainsKey(productId))
+            if ((await _readModel.GetProducts()).All(e => e.Id != productId))
             {
                 return NotFound();
             }

@@ -45,7 +45,7 @@ namespace EDrinks.Test.Integration
 
         protected void DeleteStream()
         {
-            _fixture.Connection.DeleteStreamAsync(_fixture.Stream, ExpectedVersion.Any, false).Wait();
+            _fixture.Connection.DeleteStreamAsync(_fixture.StreamResolver.GetStream(), ExpectedVersion.Any, false).Wait();
         }
 
         protected async Task WriteToStream(BaseEvent evt)
@@ -56,7 +56,7 @@ namespace EDrinks.Test.Integration
             var eventData = new EventData(Guid.NewGuid(), evt.GetType().Name, true,
                 Encoding.UTF8.GetBytes(contentStr), Encoding.UTF8.GetBytes(metaDataStr));
 
-            await _fixture.Connection.AppendToStreamAsync(_fixture.Stream, ExpectedVersion.Any, eventData);
+            await _fixture.Connection.AppendToStreamAsync(_fixture.StreamResolver.GetStream(), ExpectedVersion.Any, eventData);
         }
     }
 }
