@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Reflection;
 using EDrinks.Common;
@@ -54,6 +55,7 @@ namespace EDrinks.WebApi
                 .Select(assemblyName => Assembly.Load(assemblyName));
             services.AddMediatR(assemblies);
 
+            services.AddCors();
             services.AddMvc();
         }
 
@@ -64,6 +66,10 @@ namespace EDrinks.WebApi
             {
                 app.UseDeveloperExceptionPage();
             }
+            
+            var origins = new List<string>();
+            Configuration.GetSection("AppSettings").GetSection("AllowedOrigins").Bind(origins);
+            app.UseCors(builder => builder.WithOrigins(origins.ToArray()).AllowAnyHeader().AllowAnyMethod());
 
             app.UseMvc();
         }
