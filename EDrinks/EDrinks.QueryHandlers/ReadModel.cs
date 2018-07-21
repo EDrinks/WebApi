@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using EDrinks.Common;
 using EDrinks.Events;
 using EDrinks.Events.Products;
+using EDrinks.Events.Tabs;
 using EDrinks.QueryHandlers.Model;
 using EventStore.ClientAPI;
 using Newtonsoft.Json;
@@ -15,6 +16,8 @@ namespace EDrinks.QueryHandlers
     public interface IReadModel
     {
         Task<List<Product>> GetProducts();
+        
+        Task<List<Tab>> GetTabs();
     }
 
     public class ReadModel : IReadModel
@@ -24,6 +27,7 @@ namespace EDrinks.QueryHandlers
         private readonly IEventLookup _eventLookup;
 
         public Dictionary<Guid, Product> Products { get; set; }
+        public Dictionary<Guid, Tab> Tabs { get; set; }
 
         public ReadModel(IEventStoreConnection connection, IStreamResolver streamResolver, IEventLookup eventLookup)
         {
@@ -32,9 +36,22 @@ namespace EDrinks.QueryHandlers
             _eventLookup = eventLookup;
 
             Products = new Dictionary<Guid, Product>();
+            Tabs = new Dictionary<Guid, Tab>();
         }
 
         public async Task<List<Product>> GetProducts()
+        {
+            await ApplyAllEvents();
+            return Products.Values.ToList();
+        }
+
+        public async Task<List<Tab>> GetTabs()
+        {
+            await ApplyAllEvents();
+            return null;
+        }
+
+        private async Task ApplyAllEvents()
         {
             var events = new List<ResolvedEvent>();
 
@@ -60,8 +77,6 @@ namespace EDrinks.QueryHandlers
                     await EventAppeared(obj);
                 }
             }
-
-            return Products.Values.ToList();
         }
 
         private async Task EventAppeared(BaseEvent evt)
@@ -81,6 +96,14 @@ namespace EDrinks.QueryHandlers
                     break;
                 case ProductDeleted pd:
                     Products.Remove(pd.ProductId);
+                    break;
+                case TabCreated tc:
+                    var tab = new Tab();
+                    tab.Apply(tc);
+                    Tabs.Add(tc.TabId, tab);
+                    break;
+                case TabNameChanged tnc:
+                    Tabs[tnc.TabId].Apply(tnc);
                     break;
             }
         }

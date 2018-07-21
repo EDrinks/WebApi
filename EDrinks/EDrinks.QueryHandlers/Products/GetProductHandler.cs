@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using EDrinks.Common;
 using EDrinks.QueryHandlers.Model;
 
-namespace EDrinks.QueryHandlers
+namespace EDrinks.QueryHandlers.Products
 {
     public class GetProductQuery : IQueryRequest<Product>
     {
