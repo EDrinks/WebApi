@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using EDrinks.CommandHandlers.Tabs;
 using EDrinks.QueryHandlers.Tabs;
+using EDrinks.WebApi.Attributes;
 using EDrinks.WebApi.Dtos;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -35,6 +36,7 @@ namespace EDrinks.WebApi.Controllers
         }
 
         [HttpPost]
+        [ValidateModel]
         public async Task<IActionResult> CreateTab([FromBody] TabDto tab)
         {
             var result = await _mediator.Send(new CreateTabCommand()
