@@ -1,7 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using EDrinks.Events.Tabs;
 using EDrinks.QueryHandlers.Model;
 using Xunit;
 
@@ -22,6 +24,22 @@ namespace EDrinks.Test.Integration.Endpoints.TabsController
 
             var content = await Deserialize<List<Tab>>(response);
             Assert.Empty(content);
+        }
+
+        [Fact]
+        public async Task TestGetTabs()
+        {
+            int numOfTabs = 3;
+
+            for (int i = 0; i < numOfTabs; i++)
+            {
+                await WriteToStream(new TabCreated() {TabId = Guid.NewGuid()});
+            }
+
+            var response = await CallEndpoint();
+            
+            var content = await Deserialize<List<Tab>>(response);
+            Assert.Equal(numOfTabs, content.Count);
         }
 
         private async Task<HttpResponseMessage> CallEndpoint()
