@@ -5,7 +5,7 @@ using EDrinks.Events;
 using EDrinks.Events.Products;
 using EDrinks.EventSource;
 
-namespace EDrinks.CommandHandlers
+namespace EDrinks.CommandHandlers.Products
 {
     public class UpdateProductCommand : ICommandRequest
     {

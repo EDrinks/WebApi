@@ -4,7 +4,7 @@ using EDrinks.Common;
 using EDrinks.Events.Products;
 using EDrinks.EventSource;
 
-namespace EDrinks.CommandHandlers
+namespace EDrinks.CommandHandlers.Products
 {
     public class DeleteProductCommand : ICommandRequest
     {
