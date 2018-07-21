@@ -13,6 +13,7 @@ namespace EDrinks.Test.Integration.Endpoints.TabsController
     {
         public GetTabs(ServiceFixture fixture) : base(fixture)
         {
+            DeleteStream();
         }
 
         [Fact]
