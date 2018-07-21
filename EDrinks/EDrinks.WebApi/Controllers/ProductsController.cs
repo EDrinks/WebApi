@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using System.Threading.Tasks;
 using EDrinks.CommandHandlers;
 using EDrinks.Common;
@@ -15,12 +14,10 @@ namespace EDrinks.WebApi.Controllers
     public class ProductsController : BaseController
     {
         private readonly IMediator _mediator;
-        private readonly IReadModel _readModel;
 
-        public ProductsController(IMediator mediator, IReadModel readModel)
+        public ProductsController(IMediator mediator)
         {
             _mediator = mediator;
-            _readModel = readModel;
         }
 
         [HttpGet]
