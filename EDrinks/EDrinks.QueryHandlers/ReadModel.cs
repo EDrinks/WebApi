@@ -48,7 +48,7 @@ namespace EDrinks.QueryHandlers
         public async Task<List<Tab>> GetTabs()
         {
             await ApplyAllEvents();
-            return null;
+            return Tabs.Values.ToList();
         }
 
         private async Task ApplyAllEvents()

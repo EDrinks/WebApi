@@ -1,4 +1,7 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
+using EDrinks.CommandHandlers.Tabs;
+using EDrinks.QueryHandlers.Tabs;
 using EDrinks.WebApi.Dtos;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -18,13 +21,28 @@ namespace EDrinks.WebApi.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
-            return null;
+            var result = await _mediator.Send(new GetTabsQuery());
+            
+            return ResultToResponse(result);
+        }
+
+        [HttpGet("{tabId}")]
+        public async Task<IActionResult> GetSingle([FromRoute] Guid tabId)
+        {
+            var result = await _mediator.Send(new GetTabQuery() {TabId = tabId});
+
+            return ResultToResponse(result);
         }
 
         [HttpPost]
         public async Task<IActionResult> CreateTab([FromBody] TabDto tab)
         {
-            return null;
+            var result = await _mediator.Send(new CreateTabCommand()
+            {
+                Name = tab.Name
+            });
+            
+            return ResultToResponse(result);
         }
     }
 }
