@@ -3,6 +3,7 @@
     public enum ResultCode
     {
         Ok,
+        NotFound,
         Error
     }
 }

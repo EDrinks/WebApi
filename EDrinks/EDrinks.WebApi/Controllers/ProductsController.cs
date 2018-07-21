@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using EDrinks.CommandHandlers;
+using EDrinks.Common;
 using EDrinks.QueryHandlers;
 using EDrinks.WebApi.Attributes;
 using EDrinks.WebApi.Dtos;
@@ -30,6 +31,14 @@ namespace EDrinks.WebApi.Controllers
             return ResultToResponse(result);
         }
 
+        [HttpGet("{productId}")]
+        public async Task<IActionResult> GetById([FromRoute] Guid productId)
+        {
+            var result = await _mediator.Send(new GetProductQuery() {Id = productId});
+
+            return ResultToResponse(result);
+        }
+
         [HttpPost]
         [ValidateModel]
         public async Task<IActionResult> CreateProduct([FromBody] ProductDto productDto)
@@ -47,10 +56,8 @@ namespace EDrinks.WebApi.Controllers
         [ValidateModel]
         public async Task<IActionResult> UpdateProduct([FromRoute] Guid productId, [FromBody] ProductDto productDto)
         {
-            if ((await _readModel.GetProducts()).All(e => e.Id != productId))
-            {
-                return NotFound();
-            }
+            var readResult = await _mediator.Send(new GetProductQuery() {Id = productId});
+            if (readResult.ResultCode != ResultCode.Ok) return ResultToResponse(readResult);
 
             var result = await _mediator.Send(new UpdateProductCommand()
             {
@@ -65,10 +72,8 @@ namespace EDrinks.WebApi.Controllers
         [HttpDelete("{productId}")]
         public async Task<IActionResult> DeleteProduct([FromRoute] Guid productId)
         {
-            if ((await _readModel.GetProducts()).All(e => e.Id != productId))
-            {
-                return NotFound();
-            }
+            var readResult = await _mediator.Send(new GetProductQuery() {Id = productId});
+            if (readResult.ResultCode != ResultCode.Ok) return ResultToResponse(readResult);
 
             var result = await _mediator.Send(new DeleteProductCommand()
             {

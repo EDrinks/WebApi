@@ -11,6 +11,8 @@ namespace EDrinks.WebApi.Controllers
             {
                 case ResultCode.Ok:
                     return Ok();
+                case ResultCode.NotFound:
+                    return NotFound();
                 case ResultCode.Error:
                     return StatusCode(500);
                 default:
@@ -24,6 +26,8 @@ namespace EDrinks.WebApi.Controllers
             {
                 case ResultCode.Ok:
                     return Ok(handlerResult.Payload);
+                case ResultCode.NotFound:
+                    return NotFound();
                 case ResultCode.Error:
                     return StatusCode(500);
                 default:

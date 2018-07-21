@@ -31,5 +31,13 @@ namespace EDrinks.QueryHandlers
                 ResultCode = ResultCode.Error
             };
         }
+
+        protected HandlerResult<TReturn> NotFound()
+        {
+            return new HandlerResult<TReturn>()
+            {
+                ResultCode = ResultCode.NotFound
+            };
+        }
     }
 }
