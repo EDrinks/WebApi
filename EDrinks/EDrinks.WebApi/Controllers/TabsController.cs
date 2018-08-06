@@ -47,6 +47,22 @@ namespace EDrinks.WebApi.Controllers
             
             return ResultToResponse(result);
         }
+        
+        [HttpPut("{tabId}")]
+        [ValidateModel]
+        public async Task<IActionResult> UpdateTab([FromRoute] Guid tabId, [FromBody] TabDto tab)
+        {
+            var readResult = await _mediator.Send(new GetTabQuery() {TabId = tabId});
+            if (readResult.ResultCode != ResultCode.Ok) return ResultToResponse(readResult);
+            
+            var result = await _mediator.Send(new UpdateTabCommand()
+            {
+                TabId = tabId,
+                Name = tab.Name
+            });
+            
+            return ResultToResponse(result);
+        }
 
         [HttpDelete("{tabId}")]
         public async Task<IActionResult> DeleteTab([FromRoute] Guid tabId)
