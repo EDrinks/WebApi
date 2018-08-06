@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using EDrinks.CommandHandlers.Tabs;
+using EDrinks.Common;
 using EDrinks.QueryHandlers.Tabs;
 using EDrinks.WebApi.Attributes;
 using EDrinks.WebApi.Dtos;
@@ -42,6 +43,20 @@ namespace EDrinks.WebApi.Controllers
             var result = await _mediator.Send(new CreateTabCommand()
             {
                 Name = tab.Name
+            });
+            
+            return ResultToResponse(result);
+        }
+
+        [HttpDelete("{tabId}")]
+        public async Task<IActionResult> DeleteTab([FromRoute] Guid tabId)
+        {
+            var readResult = await _mediator.Send(new GetTabQuery() {TabId = tabId});
+            if (readResult.ResultCode != ResultCode.Ok) return ResultToResponse(readResult);
+
+            var result = await _mediator.Send(new DeleteTabCommand()
+            {
+                TabId = tabId
             });
             
             return ResultToResponse(result);

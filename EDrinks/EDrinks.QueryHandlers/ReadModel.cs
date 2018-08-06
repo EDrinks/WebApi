@@ -105,6 +105,9 @@ namespace EDrinks.QueryHandlers
                 case TabNameChanged tnc:
                     Tabs[tnc.TabId].Apply(tnc);
                     break;
+                case TabDeleted td:
+                    Tabs.Remove(td.TabId);
+                    break;
             }
         }
     }
