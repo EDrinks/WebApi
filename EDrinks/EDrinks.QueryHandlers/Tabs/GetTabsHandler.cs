@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using EDrinks.Common;
 using EDrinks.QueryHandlers.Model;
@@ -20,7 +21,7 @@ namespace EDrinks.QueryHandlers.Tabs
         
         protected override async Task<HandlerResult<List<Tab>>> DoHandle(GetTabsQuery request)
         {
-            return Ok(await _readModel.GetTabs());
+            return Ok((await _readModel.GetTabs()).OrderBy(e => e.Name).ToList());
         }
     }
 }
