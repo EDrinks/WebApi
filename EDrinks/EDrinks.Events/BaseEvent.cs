@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using System;
+using Newtonsoft.Json;
 
 namespace EDrinks.Events
 {
@@ -16,5 +17,7 @@ namespace EDrinks.Events
     public class MetaData
     {
         public string CreatedBy { get; set; } = "system";
+
+        public DateTime CreatedOn { get; set; } = DateTime.Now;
     }
 }

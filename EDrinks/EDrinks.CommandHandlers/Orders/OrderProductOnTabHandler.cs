@@ -28,6 +28,7 @@ namespace EDrinks.CommandHandlers.Orders
         {
             await _eventSource.WriteEvent(new ProductOrderedOnTab()
             {
+                OrderId = Guid.NewGuid(),
                 TabId = request.TabId,
                 ProductId = request.ProductId,
                 Quantity = request.Quantity

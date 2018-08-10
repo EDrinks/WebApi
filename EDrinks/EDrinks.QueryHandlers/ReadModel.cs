@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using EDrinks.Common;
 using EDrinks.Events;
+using EDrinks.Events.Orders;
 using EDrinks.Events.Products;
 using EDrinks.Events.Tabs;
 using EDrinks.QueryHandlers.Model;
@@ -18,6 +19,8 @@ namespace EDrinks.QueryHandlers
         Task<List<Product>> GetProducts();
         
         Task<List<Tab>> GetTabs();
+
+        Task<List<Order>> GetOrdersOfTab(Guid tabId);
     }
 
     public class ReadModel : IReadModel
@@ -28,6 +31,7 @@ namespace EDrinks.QueryHandlers
 
         public Dictionary<Guid, Product> Products { get; set; }
         public Dictionary<Guid, Tab> Tabs { get; set; }
+        public Dictionary<Guid, List<Order>> TabToOrders { get; set; }
 
         public ReadModel(IEventStoreConnection connection, IStreamResolver streamResolver, IEventLookup eventLookup)
         {
@@ -37,6 +41,7 @@ namespace EDrinks.QueryHandlers
 
             Products = new Dictionary<Guid, Product>();
             Tabs = new Dictionary<Guid, Tab>();
+            TabToOrders = new Dictionary<Guid, List<Order>>();
         }
 
         public async Task<List<Product>> GetProducts()
@@ -49,6 +54,12 @@ namespace EDrinks.QueryHandlers
         {
             await ApplyAllEvents();
             return Tabs.Values.ToList();
+        }
+
+        public async Task<List<Order>> GetOrdersOfTab(Guid tabId)
+        {
+            await ApplyAllEvents();
+            return TabToOrders[tabId];
         }
 
         private async Task ApplyAllEvents()
@@ -107,6 +118,19 @@ namespace EDrinks.QueryHandlers
                     break;
                 case TabDeleted td:
                     Tabs.Remove(td.TabId);
+                    break;
+                case ProductOrderedOnTab poot:
+                    if (!TabToOrders.ContainsKey(poot.TabId))
+                    {
+                        TabToOrders.Add(poot.TabId, new List<Order>());
+                    }
+                    TabToOrders[poot.TabId].Add(new Order()
+                    {
+                        Id = poot.OrderId,
+                        ProductId = poot.ProductId,
+                        Quantity = poot.Quantity,
+                        DateTime = poot.MetaData.CreatedOn
+                    });
                     break;
             }
         }
