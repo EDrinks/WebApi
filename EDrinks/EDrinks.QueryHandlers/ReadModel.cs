@@ -29,6 +29,8 @@ namespace EDrinks.QueryHandlers
         private readonly IStreamResolver _streamResolver;
         private readonly IEventLookup _eventLookup;
 
+        private bool _eventsLoaded = false;
+
         public Dictionary<Guid, Product> Products { get; set; }
         public Dictionary<Guid, Tab> Tabs { get; set; }
         public Dictionary<Guid, List<Order>> TabToOrders { get; set; }
@@ -64,6 +66,8 @@ namespace EDrinks.QueryHandlers
 
         private async Task ApplyAllEvents()
         {
+            if (_eventsLoaded) return;
+            
             var events = new List<ResolvedEvent>();
 
             StreamEventsSlice currentSlice;
@@ -88,6 +92,8 @@ namespace EDrinks.QueryHandlers
                     await EventAppeared(obj);
                 }
             }
+
+            _eventsLoaded = true;
         }
 
         private async Task EventAppeared(BaseEvent evt)
