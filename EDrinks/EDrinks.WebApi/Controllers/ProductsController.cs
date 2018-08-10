@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
-using EDrinks.CommandHandlers;
 using EDrinks.CommandHandlers.Products;
 using EDrinks.Common;
-using EDrinks.QueryHandlers;
 using EDrinks.QueryHandlers.Products;
 using EDrinks.WebApi.Attributes;
 using EDrinks.WebApi.Dtos;
