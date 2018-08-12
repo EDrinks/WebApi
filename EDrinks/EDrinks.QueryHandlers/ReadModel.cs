@@ -135,7 +135,8 @@ namespace EDrinks.QueryHandlers
                         Id = poot.OrderId,
                         ProductId = poot.ProductId,
                         Quantity = poot.Quantity,
-                        DateTime = poot.MetaData.CreatedOn
+                        DateTime = poot.MetaData.CreatedOn,
+                        ProductPrice = Products[poot.ProductId].Price
                     });
                     break;
             }

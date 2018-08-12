@@ -11,5 +11,7 @@ namespace EDrinks.QueryHandlers.Model
         public Guid ProductId { get; set; }
 
         public int Quantity { get; set; }
+
+        public decimal ProductPrice { get; set; }
     }
 }
