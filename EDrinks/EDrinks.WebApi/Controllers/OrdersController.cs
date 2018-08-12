@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using EDrinks.CommandHandlers.Orders;
 using EDrinks.Common;
+using EDrinks.QueryHandlers.Orders;
 using EDrinks.QueryHandlers.Products;
 using EDrinks.QueryHandlers.Tabs;
 using EDrinks.WebApi.Attributes;
@@ -19,6 +20,21 @@ namespace EDrinks.WebApi.Controllers
         public OrdersController(IMediator mediator)
         {
             _mediator = mediator;
+        }
+
+        [Route("Tabs/{tabId}/Orders")]
+        [HttpGet]
+        public async Task<IActionResult> GetOrders([FromRoute] Guid tabId)
+        {
+            var tabResult = await _mediator.Send(new GetTabQuery() {TabId = tabId});
+            if (tabResult.ResultCode != ResultCode.Ok) return ResultToResponse(tabResult);
+
+            var result = await _mediator.Send(new GetOrdersOfTabQuery()
+            {
+                TabId = tabId
+            });
+            
+            return ResultToResponse(result);
         }
 
         [Route("Tabs/{tabId}/Orders")]
