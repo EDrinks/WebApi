@@ -61,7 +61,7 @@ namespace EDrinks.QueryHandlers
         public async Task<List<Order>> GetOrdersOfTab(Guid tabId)
         {
             await ApplyAllEvents();
-            return TabToOrders[tabId];
+            return TabToOrders.ContainsKey(tabId) ? TabToOrders[tabId] : new List<Order>();
         }
 
         private async Task ApplyAllEvents()
