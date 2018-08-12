@@ -85,10 +85,12 @@ namespace EDrinks.QueryHandlers
             foreach (var resolvedEvent in events)
             {
                 var data = Encoding.UTF8.GetString(resolvedEvent.Event.Data);
+                var metaData = Encoding.UTF8.GetString(resolvedEvent.Event.Metadata);
                 Type eventType = _eventLookup.GetType(resolvedEvent.Event.EventType);
                 if (eventType != null)
                 {
                     var obj = (BaseEvent) JsonConvert.DeserializeObject(data, eventType);
+                    obj.MetaData = JsonConvert.DeserializeObject<MetaData>(metaData);
                     await EventAppeared(obj);
                 }
             }
