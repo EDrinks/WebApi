@@ -10,6 +10,7 @@ using EDrinks.QueryHandlers;
 using EDrinks.WebApi.Services;
 using EventStore.ClientAPI;
 using MediatR;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -54,6 +55,18 @@ namespace EDrinks.WebApi
             var assemblies = (new[] {"EDrinks.QueryHandlers", "EDrinks.CommandHandlers"})
                 .Select(assemblyName => Assembly.Load(assemblyName));
             services.AddMediatR(assemblies);
+            
+            string domain = $"https://{Configuration["Auth0:Domain"]}/";
+            services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+
+            }).AddJwtBearer(options =>
+            {
+                options.Authority = domain;
+                options.Audience = Configuration["Auth0:ApiIdentifier"];
+            });
 
             services.AddCors();
             services.AddMvc();
@@ -71,6 +84,7 @@ namespace EDrinks.WebApi
             Configuration.GetSection("AppSettings").GetSection("AllowedOrigins").Bind(origins);
             app.UseCors(builder => builder.WithOrigins(origins.ToArray()).AllowAnyHeader().AllowAnyMethod());
 
+            app.UseAuthentication();
             app.UseMvc();
         }
     }

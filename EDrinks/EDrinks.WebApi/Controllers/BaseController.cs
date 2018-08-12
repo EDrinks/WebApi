@@ -1,8 +1,10 @@
 ﻿using EDrinks.Common;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EDrinks.WebApi.Controllers
 {
+    [Authorize]
     public class BaseController : Controller
     {
         protected IActionResult ResultToResponse(HandlerResult handlerResult)
