@@ -2,7 +2,6 @@
 using System.Net;
 using System.Net.Http;
 using EDrinks.Common;
-using EDrinks.WebApi;
 using EventStore.ClientAPI;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
@@ -22,7 +21,7 @@ namespace EDrinks.Test.Integration
         public ServiceFixture()
         {
             var testServer = new TestServer(WebHost.CreateDefaultBuilder()
-                .UseStartup<Startup>()
+                .UseStartup<TestStartup>()
                 .ConfigureTestServices(services => { services.AddScoped<IStreamResolver, TestStreamResolver>(); }));
             Client = testServer.CreateClient();
             

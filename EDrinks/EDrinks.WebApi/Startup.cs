@@ -56,6 +56,15 @@ namespace EDrinks.WebApi
                 .Select(assemblyName => Assembly.Load(assemblyName));
             services.AddMediatR(assemblies);
             
+            ConfigureAuth(services);
+
+            services.AddCors();
+            services.AddMvc();
+            services.AddHttpContextAccessor();
+        }
+
+        protected virtual void ConfigureAuth(IServiceCollection services)
+        {
             string domain = $"https://{Configuration["Auth0:Domain"]}/";
             services.AddAuthentication(options =>
             {
@@ -67,10 +76,6 @@ namespace EDrinks.WebApi
                 options.Authority = domain;
                 options.Audience = Configuration["Auth0:ApiIdentifier"];
             });
-
-            services.AddCors();
-            services.AddMvc();
-            services.AddHttpContextAccessor();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
