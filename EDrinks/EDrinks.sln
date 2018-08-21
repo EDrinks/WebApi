@@ -16,6 +16,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{1ECC6841
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EDrinks.Test.Integration", "Tests\EDrinks.Test.Integration\EDrinks.Test.Integration.csproj", "{05D039AF-D7B8-4F7F-BFA2-0C0E5C45F75C}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Helpers", "Helpers", "{D920F4C2-B74B-4565-86D3-B4AFC4631442}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EDrinks.Helper.DataFiller", "EDrinks.Helper.DataFiller\EDrinks.Helper.DataFiller.csproj", "{A9507821-07D9-4FC1-9B41-AA3677B6CC5E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -50,8 +54,13 @@ Global
 		{05D039AF-D7B8-4F7F-BFA2-0C0E5C45F75C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{05D039AF-D7B8-4F7F-BFA2-0C0E5C45F75C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{05D039AF-D7B8-4F7F-BFA2-0C0E5C45F75C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A9507821-07D9-4FC1-9B41-AA3677B6CC5E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A9507821-07D9-4FC1-9B41-AA3677B6CC5E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A9507821-07D9-4FC1-9B41-AA3677B6CC5E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A9507821-07D9-4FC1-9B41-AA3677B6CC5E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{05D039AF-D7B8-4F7F-BFA2-0C0E5C45F75C} = {1ECC6841-B088-4A9D-B114-9862F99D0A04}
+		{A9507821-07D9-4FC1-9B41-AA3677B6CC5E} = {D920F4C2-B74B-4565-86D3-B4AFC4631442}
 	EndGlobalSection
 EndGlobal
