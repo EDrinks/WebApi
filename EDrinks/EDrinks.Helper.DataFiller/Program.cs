@@ -1,9 +1,9 @@
 ﻿using System;
-using System.IO;
 using System.Net;
 using System.Text;
 using Bogus;
 using EDrinks.Events;
+using EDrinks.Events.Products;
 using EDrinks.Events.Tabs;
 using EventStore.ClientAPI;
 using Microsoft.Extensions.Configuration;
@@ -31,11 +31,12 @@ namespace EDrinks.Helper.DataFiller
 
             string stream = args[0];
             int numberOfTabs = Convert.ToInt32(args[1]);
+            int numberOfProducts = Convert.ToInt32(args[2]);
 
-            FillTabs(connection, stream, numberOfTabs);
+            FillTabs(connection, stream, numberOfTabs, numberOfProducts);
         }
 
-        static void FillTabs(IEventStoreConnection connection, string stream, int numberOfTabs)
+        static void FillTabs(IEventStoreConnection connection, string stream, int numberOfTabs, int numberOfProducts)
         {
             var faker = new Faker();
             
@@ -51,6 +52,26 @@ namespace EDrinks.Helper.DataFiller
                 {
                     TabId = tabId,
                     Name = $"{faker.Name.FirstName()} {faker.Name.LastName()}"
+                })).Wait();
+            }
+
+            for (int i = 0; i < numberOfProducts; i++)
+            {
+                var productId = Guid.NewGuid();
+
+                connection.AppendToStreamAsync(stream, ExpectedVersion.Any, GetEventData(new ProductCreated()
+                {
+                    ProductId = productId
+                })).Wait();
+                connection.AppendToStreamAsync(stream, ExpectedVersion.Any, GetEventData(new ProductNameChanged()
+                {
+                    ProductId = productId,
+                    Name = faker.Commerce.Product()
+                })).Wait();
+                connection.AppendToStreamAsync(stream, ExpectedVersion.Any, GetEventData(new ProductPriceChanged()
+                {
+                    ProductId = productId,
+                    Price = faker.Random.Decimal(0.5M, 3.0M)
                 })).Wait();
             }
         }
