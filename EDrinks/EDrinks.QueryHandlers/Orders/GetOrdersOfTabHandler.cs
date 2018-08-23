@@ -23,7 +23,9 @@ namespace EDrinks.QueryHandlers.Orders
 
         protected override async Task<HandlerResult<List<Order>>> DoHandle(GetOrdersOfTabQuery request)
         {
-            return Ok((await _readModel.GetOrdersOfTab(request.TabId)).OrderBy(e => e.DateTime).ToList());
+            var allOrders = await _readModel.GetOrders();
+
+            return Ok(allOrders.Where(e => e.TabId == request.TabId).ToList());
         }
     }
 }

@@ -22,9 +22,17 @@ namespace EDrinks.WebApi.Controllers
             _mediator = mediator;
         }
 
+        [HttpGet("Orders")]
+        public async Task<IActionResult> GetCurrentOrders()
+        {
+            var result = await _mediator.Send(new GetCurrentOrdersQuery());
+            
+            return ResultToResponse(result);
+        }
+
         [Route("Tabs/{tabId}/Orders")]
         [HttpGet]
-        public async Task<IActionResult> GetOrders([FromRoute] Guid tabId)
+        public async Task<IActionResult> GetOrdersForTab([FromRoute] Guid tabId)
         {
             var tabResult = await _mediator.Send(new GetTabQuery() {TabId = tabId});
             if (tabResult.ResultCode != ResultCode.Ok) return ResultToResponse(tabResult);

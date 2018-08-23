@@ -20,7 +20,7 @@ namespace EDrinks.QueryHandlers
         
         Task<List<Tab>> GetTabs();
 
-        Task<List<Order>> GetOrdersOfTab(Guid tabId);
+        Task<List<Order>> GetOrders();
     }
 
     public class ReadModel : IReadModel
@@ -33,7 +33,7 @@ namespace EDrinks.QueryHandlers
 
         public Dictionary<Guid, Product> Products { get; set; }
         public Dictionary<Guid, Tab> Tabs { get; set; }
-        public Dictionary<Guid, List<Order>> TabToOrders { get; set; }
+        public List<Order> Orders { get; set; }
 
         public ReadModel(IEventStoreConnection connection, IStreamResolver streamResolver, IEventLookup eventLookup)
         {
@@ -43,7 +43,7 @@ namespace EDrinks.QueryHandlers
 
             Products = new Dictionary<Guid, Product>();
             Tabs = new Dictionary<Guid, Tab>();
-            TabToOrders = new Dictionary<Guid, List<Order>>();
+            Orders = new List<Order>();
         }
 
         public async Task<List<Product>> GetProducts()
@@ -58,10 +58,10 @@ namespace EDrinks.QueryHandlers
             return Tabs.Values.ToList();
         }
 
-        public async Task<List<Order>> GetOrdersOfTab(Guid tabId)
+        public async Task<List<Order>> GetOrders()
         {
             await ApplyAllEvents();
-            return TabToOrders.ContainsKey(tabId) ? TabToOrders[tabId] : new List<Order>();
+            return Orders;
         }
 
         private async Task ApplyAllEvents()
@@ -128,14 +128,11 @@ namespace EDrinks.QueryHandlers
                     Tabs.Remove(td.TabId);
                     break;
                 case ProductOrderedOnTab poot:
-                    if (!TabToOrders.ContainsKey(poot.TabId))
-                    {
-                        TabToOrders.Add(poot.TabId, new List<Order>());
-                    }
-                    TabToOrders[poot.TabId].Add(new Order()
+                    Orders.Add(new Order()
                     {
                         Id = poot.OrderId,
                         ProductId = poot.ProductId,
+                        TabId = poot.TabId,
                         Quantity = poot.Quantity,
                         DateTime = poot.MetaData.CreatedOn,
                         ProductPrice = Products[poot.ProductId].Price
