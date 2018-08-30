@@ -31,7 +31,7 @@ namespace EDrinks.CommandHandlers.Tabs
                 new TabNameChanged() {TabId = tabId, Name = request.Name}
             });
 
-            return Ok();
+            return Created(tabId);
         }
     }
 }

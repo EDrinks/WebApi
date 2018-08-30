@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using EDrinks.Common;
 using MediatR;
@@ -18,6 +19,15 @@ namespace EDrinks.CommandHandlers
         protected HandlerResult Ok()
         {
             return new HandlerResult() {ResultCode = ResultCode.Ok};
+        }
+
+        protected HandlerResult<Guid> Created(Guid id)
+        {
+            return new HandlerResult<Guid>()
+            {
+                ResultCode = ResultCode.Created,
+                Payload = id
+            };
         }
 
         protected HandlerResult Error()

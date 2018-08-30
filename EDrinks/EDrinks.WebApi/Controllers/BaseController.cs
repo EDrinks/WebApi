@@ -28,6 +28,8 @@ namespace EDrinks.WebApi.Controllers
             {
                 case ResultCode.Ok:
                     return Ok(handlerResult.Payload);
+                case ResultCode.Created:
+                    return Created("", handlerResult.Payload);
                 case ResultCode.NotFound:
                     return NotFound();
                 case ResultCode.Error:
