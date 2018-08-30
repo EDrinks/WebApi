@@ -8,12 +8,12 @@ using MediatR;
 
 namespace EDrinks.CommandHandlers.Tabs
 {
-    public class SettleTabsCommand : IRequest
+    public class SettleTabsCommand : IRequest<Guid>
     {
         public IEnumerable<Guid> TabIds { get; set; }
     }
 
-    public class SettleTabsHandler : AsyncRequestHandler<SettleTabsCommand>
+    public class SettleTabsHandler : IRequestHandler<SettleTabsCommand, Guid>
     {
         private readonly IEventSourceFacade _eventSource;
 
@@ -22,7 +22,7 @@ namespace EDrinks.CommandHandlers.Tabs
             _eventSource = eventSource;
         }
 
-        protected override async Task Handle(SettleTabsCommand request, CancellationToken cancellationToken)
+        public async Task<Guid> Handle(SettleTabsCommand request, CancellationToken cancellationToken)
         {
             var settlementEvents = new List<TabSettled>();
             var settlementId = Guid.NewGuid();
@@ -37,6 +37,8 @@ namespace EDrinks.CommandHandlers.Tabs
             }
 
             await _eventSource.WriteEvents(settlementEvents);
+
+            return settlementId;
         }
     }
 }

@@ -30,12 +30,12 @@ namespace EDrinks.WebApi.Controllers
                 if (readResult.ResultCode != ResultCode.Ok) return BadRequest("One of the tabs does not exist");
             }
 
-            await _mediator.Send(new SettleTabsCommand()
+            var settlementId = await _mediator.Send(new SettleTabsCommand()
             {
                 TabIds = tabIds
             });
 
-            return Ok();
+            return Created($"/api/Settlements/{settlementId}", settlementId);
         }
     }
 }

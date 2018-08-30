@@ -41,7 +41,8 @@ namespace EDrinks.Test.Integration.Endpoints.SettlementsController
 
             var response = await CallEndpoint(new[] {tabId});
             
-            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+            Assert.Contains(response.Headers, e => e.Key == "Location");
         }
 
         private async Task<HttpResponseMessage> CallEndpoint(object payload)
