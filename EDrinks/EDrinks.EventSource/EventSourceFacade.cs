@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using EDrinks.Common;
@@ -12,7 +13,7 @@ namespace EDrinks.EventSource
     {
         Task WriteEvent(BaseEvent evt);
 
-        Task WriteEvents(BaseEvent[] evts);
+        Task WriteEvents(IEnumerable<BaseEvent> evts);
     }
 
     public class EventSourceFacade : IEventSourceFacade
@@ -36,17 +37,17 @@ namespace EDrinks.EventSource
             await WriteEvents(new[] {evt});
         }
 
-        public async Task WriteEvents(BaseEvent[] evts)
+        public async Task WriteEvents(IEnumerable<BaseEvent> evts)
         {
-            var eventDatas = new EventData[evts.Length];
+            var eventDatas = new List<EventData>();
 
-            for (int i = 0; i < evts.Length; i++)
+            foreach (var evt in evts)
             {
-                var metaDataStr = JsonConvert.SerializeObject(evts[i].MetaData);
-                var contentStr = JsonConvert.SerializeObject(evts[i]);
+                var metaDataStr = JsonConvert.SerializeObject(evt.MetaData);
+                var contentStr = JsonConvert.SerializeObject(evt);
 
-                eventDatas[i] = new EventData(Guid.NewGuid(), evts[i].GetType().Name, true,
-                    Encoding.UTF8.GetBytes(contentStr), Encoding.UTF8.GetBytes(metaDataStr));
+                eventDatas.Add(new EventData(Guid.NewGuid(), evt.GetType().Name, true,
+                    Encoding.UTF8.GetBytes(contentStr), Encoding.UTF8.GetBytes(metaDataStr)));
             }
 
             await _connection.AppendToStreamAsync(_streamResolver.GetStream(), ExpectedVersion.Any, eventDatas);
