@@ -55,7 +55,8 @@ namespace EDrinks.Test.Integration.Endpoints.ProductsController
                 Price = 1
             });
             
-            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+            Assert.Contains(response.Headers, e => e.Key == "Location");
         }
 
         private async Task<HttpResponseMessage> CallEndpoint(object payload)

@@ -40,13 +40,13 @@ namespace EDrinks.WebApi.Controllers
         [ValidateModel]
         public async Task<IActionResult> CreateProduct([FromBody] ProductDto productDto)
         {
-            var result = await _mediator.Send(new CreateProductCommand()
+            var productId = await _mediator.Send(new CreateProductCommand()
             {
                 Name = productDto.Name,
                 Price = productDto.Price
             });
 
-            return ResultToResponse(result);
+            return Created($"/api/Products/{productId}", productId);
         }
 
         [HttpPut("{productId}")]
