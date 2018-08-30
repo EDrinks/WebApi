@@ -1,18 +1,19 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
-using EDrinks.Common;
 using EDrinks.Events;
 using EDrinks.Events.Tabs;
 using EDrinks.EventSource;
+using MediatR;
 
 namespace EDrinks.CommandHandlers.Tabs
 {
-    public class CreateTabCommand : ICommandRequest
+    public class CreateTabCommand : IRequest<Guid>
     {
         public string Name { get; set; }
     }
 
-    public class CreateTabHandler : CommandHandler<CreateTabCommand>
+    public class CreateTabHandler : IRequestHandler<CreateTabCommand, Guid>
     {
         private readonly IEventSourceFacade _eventSource;
 
@@ -21,7 +22,7 @@ namespace EDrinks.CommandHandlers.Tabs
             _eventSource = eventSource;
         }
 
-        protected override async Task<HandlerResult> DoHandle(CreateTabCommand request)
+        public async Task<Guid> Handle(CreateTabCommand request, CancellationToken cancellationToken)
         {
             var tabId = Guid.NewGuid();
 
@@ -31,7 +32,7 @@ namespace EDrinks.CommandHandlers.Tabs
                 new TabNameChanged() {TabId = tabId, Name = request.Name}
             });
 
-            return Created(tabId);
+            return tabId;
         }
     }
 }

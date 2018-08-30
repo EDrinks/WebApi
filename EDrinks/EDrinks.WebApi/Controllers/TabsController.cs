@@ -40,12 +40,12 @@ namespace EDrinks.WebApi.Controllers
         [ValidateModel]
         public async Task<IActionResult> CreateTab([FromBody] TabDto tab)
         {
-            var result = await _mediator.Send(new CreateTabCommand()
+            var tabId = await _mediator.Send(new CreateTabCommand()
             {
                 Name = tab.Name
             });
-            
-            return ResultToResponse(result);
+
+            return Created($"/api/Tabs/{tabId}", tabId);
         }
         
         [HttpPut("{tabId}")]

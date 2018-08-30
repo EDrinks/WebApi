@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using EDrinks.QueryHandlers.Model;
@@ -42,7 +43,8 @@ namespace EDrinks.Test.Integration.Endpoints.TabsController
 
             var response = await CallEndpoint(tab);
             
-            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+            Assert.Contains(response.Headers, e => e.Key == "Location");
         }
 
         private Tab GetValidTab()
