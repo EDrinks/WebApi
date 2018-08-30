@@ -138,6 +138,9 @@ namespace EDrinks.QueryHandlers
                         ProductPrice = Products[poot.ProductId].Price
                     });
                     break;
+                case TabSettled ts:
+                    Orders.RemoveAll(e => e.TabId == ts.TabId);
+                    break;
             }
         }
     }

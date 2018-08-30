@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using EDrinks.CommandHandlers.Tabs;
 using EDrinks.Common;
 using EDrinks.QueryHandlers.Tabs;
 using EDrinks.WebApi.Attributes;
@@ -28,6 +29,11 @@ namespace EDrinks.WebApi.Controllers
                 var readResult = await _mediator.Send(new GetTabQuery() {TabId = tabId});
                 if (readResult.ResultCode != ResultCode.Ok) return BadRequest("One of the tabs does not exist");
             }
+
+            await _mediator.Send(new SettleTabsCommand()
+            {
+                TabIds = tabIds
+            });
 
             return Ok();
         }

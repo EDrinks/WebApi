@@ -42,7 +42,7 @@ namespace EDrinks.Test.Integration.Workflows
             await _fixture.Client.PostAsync("/api/Settlements", Serialize(new[] {tabId}));
             ordersResponse = await _fixture.Client.GetAsync($"/api/Tabs/{tabId}/Orders");
             orders = await Deserialize<List<OrderDto>>(ordersResponse);
-            Assert.NotEmpty(orders);
+            Assert.Empty(orders);
         }
     }
 }

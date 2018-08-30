@@ -1,18 +1,19 @@
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
-using EDrinks.Common;
 using EDrinks.Events.Tabs;
 using EDrinks.EventSource;
+using MediatR;
 
 namespace EDrinks.CommandHandlers.Tabs
 {
-    public class SettleTabsCommand : ICommandRequest
+    public class SettleTabsCommand : IRequest
     {
         public IEnumerable<Guid> TabIds { get; set; }
     }
 
-    public class SettleTabsHandler : CommandHandler<SettleTabsCommand>
+    public class SettleTabsHandler : AsyncRequestHandler<SettleTabsCommand>
     {
         private readonly IEventSourceFacade _eventSource;
 
@@ -20,12 +21,12 @@ namespace EDrinks.CommandHandlers.Tabs
         {
             _eventSource = eventSource;
         }
-        
-        protected override async Task<HandlerResult> DoHandle(SettleTabsCommand request)
+
+        protected override async Task Handle(SettleTabsCommand request, CancellationToken cancellationToken)
         {
             var settlementEvents = new List<TabSettled>();
             var settlementId = Guid.NewGuid();
-            
+
             foreach (var tabId in request.TabIds)
             {
                 settlementEvents.Add(new TabSettled()
@@ -36,8 +37,6 @@ namespace EDrinks.CommandHandlers.Tabs
             }
 
             await _eventSource.WriteEvents(settlementEvents);
-
-            return Ok();
         }
     }
 }
