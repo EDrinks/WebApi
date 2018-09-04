@@ -33,7 +33,7 @@ namespace EDrinks.WebApi.Controllers
                 case ResultCode.NotFound:
                     return NotFound();
                 case ResultCode.Error:
-                    return StatusCode(500);
+                    return BadRequest(handlerResult.ErrorMessages);
                 default:
                     return StatusCode(500);
             }

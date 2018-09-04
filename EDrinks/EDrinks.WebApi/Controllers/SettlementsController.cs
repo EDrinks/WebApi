@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using EDrinks.CommandHandlers.Tabs;
 using EDrinks.Common;
+using EDrinks.QueryHandlers.Settlements;
 using EDrinks.QueryHandlers.Tabs;
 using EDrinks.WebApi.Attributes;
 using MediatR;
@@ -18,6 +19,14 @@ namespace EDrinks.WebApi.Controllers
         public SettlementsController(IMediator mediator)
         {
             _mediator = mediator;
+        }
+        
+        [HttpGet]
+        public async Task<IActionResult> GetSettlements([FromQuery] GetSettlementsQuery request)
+        {
+            var result = await _mediator.Send(request);
+
+            return ResultToResponse(result);
         }
 
         [HttpPost]

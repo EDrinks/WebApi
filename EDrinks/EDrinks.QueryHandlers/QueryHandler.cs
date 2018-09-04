@@ -1,4 +1,7 @@
-﻿using System.Threading;
+﻿using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using EDrinks.Common;
 using MediatR;
@@ -24,11 +27,12 @@ namespace EDrinks.QueryHandlers
             };
         }
 
-        protected HandlerResult<TReturn> Error()
+        protected HandlerResult<TReturn> Error(IEnumerable<string> errorMessages)
         {
             return new HandlerResult<TReturn>()
             {
-                ResultCode = ResultCode.Error
+                ResultCode = ResultCode.Error,
+                ErrorMessages = errorMessages.ToList()
             };
         }
 
