@@ -17,10 +17,12 @@ namespace EDrinks.QueryHandlers
     public interface IReadModel
     {
         Task<List<Product>> GetProducts();
-        
+
         Task<List<Tab>> GetTabs();
 
         Task<List<Order>> GetOrders();
+        
+        Task<List<Settlement>> GetSettlements();
     }
 
     public class ReadModel : IReadModel
@@ -31,9 +33,10 @@ namespace EDrinks.QueryHandlers
 
         private bool _eventsLoaded = false;
 
-        public Dictionary<Guid, Product> Products { get; set; }
-        public Dictionary<Guid, Tab> Tabs { get; set; }
-        public List<Order> Orders { get; set; }
+        private Dictionary<Guid, Product> Products { get; set; }
+        private Dictionary<Guid, Tab> Tabs { get; set; }
+        private List<Order> Orders { get; set; }
+        public Dictionary<Guid, Settlement> Settlements { get; set; }
 
         public ReadModel(IEventStoreConnection connection, IStreamResolver streamResolver, IEventLookup eventLookup)
         {
@@ -44,6 +47,7 @@ namespace EDrinks.QueryHandlers
             Products = new Dictionary<Guid, Product>();
             Tabs = new Dictionary<Guid, Tab>();
             Orders = new List<Order>();
+            Settlements = new Dictionary<Guid, Settlement>();
         }
 
         public async Task<List<Product>> GetProducts()
@@ -64,10 +68,16 @@ namespace EDrinks.QueryHandlers
             return Orders;
         }
 
+        public async Task<List<Settlement>> GetSettlements()
+        {
+            await ApplyAllEvents();
+            return Settlements.Values.ToList();
+        }
+
         private async Task ApplyAllEvents()
         {
             if (_eventsLoaded) return;
-            
+
             var events = new List<ResolvedEvent>();
 
             StreamEventsSlice currentSlice;
@@ -139,6 +149,23 @@ namespace EDrinks.QueryHandlers
                     });
                     break;
                 case TabSettled ts:
+                    if (!Settlements.ContainsKey(ts.SettlementId))
+                    {
+                        Settlements.Add(ts.SettlementId, new Settlement()
+                        {
+                            Id = ts.SettlementId,
+                            DateTime = ts.MetaData.CreatedOn
+                        });
+                    }
+
+                    var settlement = Settlements[ts.SettlementId];
+                    var orders = Orders.Where(e => e.TabId == ts.TabId);
+                    settlement.TabToOrders.Add(new TabToOrders()
+                    {
+                        Tab = Tabs[ts.TabId],
+                        Orders = orders.ToList()
+                    });
+
                     Orders.RemoveAll(e => e.TabId == ts.TabId);
                     break;
             }

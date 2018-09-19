@@ -1,7 +1,10 @@
 using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using EDrinks.Events.Tabs;
+using EDrinks.QueryHandlers.Model;
 using EDrinks.QueryHandlers.Settlements;
 using Xunit;
 
@@ -57,6 +60,24 @@ namespace EDrinks.Test.Integration.Endpoints.SettlementsController
             });
 
             Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        }
+
+        [Fact]
+        public async Task TestGetSettlements()
+        {
+            var tabId = Guid.NewGuid();
+            await WriteToStream(new TabCreated() {TabId = tabId});
+            await WriteToStream(new TabSettled() {SettlementId = Guid.NewGuid(), TabId = tabId});
+
+            var response = await CallEndpoint(new GetSettlementsQuery()
+            {
+                Start = DateTime.Now.AddDays(-5),
+                End = DateTime.Now.AddDays(5)
+            });
+
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            var settlements = await Deserialize<List<Settlement>>(response);
+            Assert.NotEmpty(settlements);
         }
 
         private async Task<HttpResponseMessage> CallEndpoint(GetSettlementsQuery request)
