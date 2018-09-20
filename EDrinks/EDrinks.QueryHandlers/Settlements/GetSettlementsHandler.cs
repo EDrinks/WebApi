@@ -33,7 +33,7 @@ namespace EDrinks.QueryHandlers.Settlements
             if (errors.Any()) return Error(errors);
 
             var settlements = (await _readModel.GetSettlements())
-                .OrderBy(e => e.DateTime)
+                .OrderByDescending(e => e.DateTime)
                 .Where(e => e.DateTime >= request.Start && e.DateTime <= request.End)
                 .Skip(request.Offset * request.PageSize)
                 .Take(request.PageSize)
