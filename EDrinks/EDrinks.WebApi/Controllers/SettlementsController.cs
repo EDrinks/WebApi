@@ -1,13 +1,19 @@
 using System;
 using System.Collections.Generic;
+using System.Data;
+using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
+using ClosedXML.Excel;
 using EDrinks.CommandHandlers.Tabs;
 using EDrinks.Common;
 using EDrinks.QueryHandlers.Settlements;
 using EDrinks.QueryHandlers.Tabs;
 using EDrinks.WebApi.Attributes;
+using EDrinks.WebApi.Utils;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Primitives;
 
 namespace EDrinks.WebApi.Controllers
 {
@@ -20,7 +26,7 @@ namespace EDrinks.WebApi.Controllers
         {
             _mediator = mediator;
         }
-        
+
         [HttpGet]
         public async Task<IActionResult> GetSettlements([FromQuery] GetSettlementsQuery request)
         {
@@ -32,12 +38,41 @@ namespace EDrinks.WebApi.Controllers
         [HttpGet("{settlementId}")]
         public async Task<IActionResult> GetSettlement([FromRoute] Guid settlementId)
         {
+            var returnType = "default";
+
+            StringValues acceptHeader;
+            if (Request.Headers.TryGetValue("Accept", out acceptHeader))
+            {
+                if (acceptHeader.Any(e => e == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
+                {
+                    returnType = "xlsx";
+                }
+                else if (acceptHeader.Any(e => e == "application/pdf"))
+                {
+                    returnType = "pdf";
+                }
+            }
+
             var result = await _mediator.Send(new GetSettlementQuery()
             {
                 SettlementId = settlementId
             });
-            
-            return ResultToResponse(result);
+
+            if (result.ResultCode != ResultCode.Ok)
+            {
+                return ResultToResponse(result);
+            }
+
+            switch (returnType)
+            {
+                case "xlsx":
+                    var stream = SettlementTransformer.SettlementToXlsxStream(result.Payload);
+                    return File(stream, "application/octet-stream");
+                case "pdf":
+                    throw new NotImplementedException();
+                default:
+                    return ResultToResponse(result);
+            }
         }
 
         [HttpPost]
