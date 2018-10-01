@@ -29,6 +29,17 @@ namespace EDrinks.WebApi.Controllers
             return ResultToResponse(result);
         }
 
+        [HttpGet("{settlementId}")]
+        public async Task<IActionResult> GetSettlement([FromRoute] Guid settlementId)
+        {
+            var result = await _mediator.Send(new GetSettlementQuery()
+            {
+                SettlementId = settlementId
+            });
+            
+            return ResultToResponse(result);
+        }
+
         [HttpPost]
         [ValidateModel]
         public async Task<IActionResult> SettleTabs([FromBody] List<Guid> tabIds)
