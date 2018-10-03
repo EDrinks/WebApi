@@ -1,10 +1,7 @@
 using System;
 using System.Collections.Generic;
-using System.Data;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using ClosedXML.Excel;
 using EDrinks.CommandHandlers.Tabs;
 using EDrinks.Common;
 using EDrinks.QueryHandlers.Settlements;
@@ -32,6 +29,14 @@ namespace EDrinks.WebApi.Controllers
         {
             var result = await _mediator.Send(request);
 
+            return ResultToResponse(result);
+        }
+
+        [HttpGet("current")]
+        public async Task<IActionResult> GetCurrentSettlement()
+        {
+            var result = await _mediator.Send(new GetCurrentSettlementQuery());
+            
             return ResultToResponse(result);
         }
 

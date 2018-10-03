@@ -21,8 +21,10 @@ namespace EDrinks.QueryHandlers
         Task<List<Tab>> GetTabs();
 
         Task<List<Order>> GetOrders();
-        
+
         Task<List<Settlement>> GetSettlements();
+
+        Task<Settlement> GetCurrentSettlement();
     }
 
     public class ReadModel : IReadModel
@@ -36,7 +38,8 @@ namespace EDrinks.QueryHandlers
         private Dictionary<Guid, Product> Products { get; set; }
         private Dictionary<Guid, Tab> Tabs { get; set; }
         private List<Order> Orders { get; set; }
-        public Dictionary<Guid, Settlement> Settlements { get; set; }
+        private Dictionary<Guid, Settlement> Settlements { get; set; }
+        private Settlement CurrentSettlement;
 
         public ReadModel(IEventStoreConnection connection, IStreamResolver streamResolver, IEventLookup eventLookup)
         {
@@ -48,6 +51,7 @@ namespace EDrinks.QueryHandlers
             Tabs = new Dictionary<Guid, Tab>();
             Orders = new List<Order>();
             Settlements = new Dictionary<Guid, Settlement>();
+            CurrentSettlement = new Settlement();
         }
 
         public async Task<List<Product>> GetProducts()
@@ -72,6 +76,12 @@ namespace EDrinks.QueryHandlers
         {
             await ApplyAllEvents();
             return Settlements.Values.ToList();
+        }
+
+        public async Task<Settlement> GetCurrentSettlement()
+        {
+            await ApplyAllEvents();
+            return CurrentSettlement;
         }
 
         private async Task ApplyAllEvents()
@@ -138,7 +148,7 @@ namespace EDrinks.QueryHandlers
                     Tabs.Remove(td.TabId);
                     break;
                 case ProductOrderedOnTab poot:
-                    Orders.Add(new Order()
+                    var order = new Order()
                     {
                         Id = poot.OrderId,
                         ProductId = poot.ProductId,
@@ -146,7 +156,20 @@ namespace EDrinks.QueryHandlers
                         Quantity = poot.Quantity,
                         DateTime = poot.MetaData.CreatedOn,
                         ProductPrice = Products[poot.ProductId].Price
-                    });
+                    };
+
+                    Orders.Add(order);
+
+                    if (CurrentSettlement.TabToOrders.All(e => e.Tab.Id != poot.TabId))
+                    {
+                        CurrentSettlement.TabToOrders.Add(new TabToOrders()
+                        {
+                            Tab = Tabs[poot.TabId]
+                        });
+                    }
+
+                    var tabToOrders = CurrentSettlement.TabToOrders.Single(e => e.Tab.Id == poot.TabId);
+                    tabToOrders.Orders.Add(order);
                     break;
                 case TabSettled ts:
                     if (!Settlements.ContainsKey(ts.SettlementId))
@@ -167,6 +190,7 @@ namespace EDrinks.QueryHandlers
                     });
 
                     Orders.RemoveAll(e => e.TabId == ts.TabId);
+                    CurrentSettlement.TabToOrders.RemoveAll(e => e.Tab.Id == ts.TabId);
                     break;
             }
         }

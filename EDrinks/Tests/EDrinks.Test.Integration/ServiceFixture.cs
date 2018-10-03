@@ -2,6 +2,7 @@
 using System.Net;
 using System.Net.Http;
 using EDrinks.Common;
+using EDrinks.Test.Integration.DataGenerator;
 using EventStore.ClientAPI;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
@@ -17,6 +18,7 @@ namespace EDrinks.Test.Integration
         public IEventStoreConnection Connection;
         public IStreamResolver StreamResolver;
         public HttpClient Client { get; set; }
+        public Generator Generator { get; set; }
 
         public ServiceFixture()
         {
@@ -37,6 +39,8 @@ namespace EDrinks.Test.Integration
             Connection =
                 EventStoreConnection.Create(settings, new IPEndPoint(IPAddress.Parse(ipAddress), port));
             Connection.ConnectAsync().Wait();
+            
+            Generator = new Generator(Connection, StreamResolver.GetStream());
         }
 
         public void Dispose()
