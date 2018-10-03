@@ -47,10 +47,6 @@ namespace EDrinks.WebApi.Controllers
                 {
                     returnType = "xlsx";
                 }
-                else if (acceptHeader.Any(e => e == "application/pdf"))
-                {
-                    returnType = "pdf";
-                }
             }
 
             var result = await _mediator.Send(new GetSettlementQuery()
@@ -68,8 +64,6 @@ namespace EDrinks.WebApi.Controllers
                 case "xlsx":
                     var stream = SettlementTransformer.SettlementToXlsxStream(result.Payload);
                     return File(stream, "application/octet-stream");
-                case "pdf":
-                    throw new NotImplementedException();
                 default:
                     return ResultToResponse(result);
             }
