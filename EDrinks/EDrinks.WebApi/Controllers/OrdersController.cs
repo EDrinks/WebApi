@@ -57,14 +57,14 @@ namespace EDrinks.WebApi.Controllers
             var productResult = await _mediator.Send(new GetProductQuery() {Id = order.ProductId});
             if (productResult.ResultCode != ResultCode.Ok) return BadRequest("Error fetching product");
 
-            var result = await _mediator.Send(new OrderProductOnTabCommand()
+            var orderId = await _mediator.Send(new OrderProductOnTabCommand()
             {
                 TabId = tabId,
                 ProductId = order.ProductId,
                 Quantity = order.Quantity
             });
 
-            return ResultToResponse(result);
+            return Created($"/api/Tabs/{tabId}/Orders/{orderId}", orderId);
         }
 
         [Route("Tabs/{tabId}/Orders/{orderId}")]

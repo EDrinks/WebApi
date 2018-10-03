@@ -60,7 +60,7 @@ namespace EDrinks.Test.Integration.Endpoints.OrdersController
 
             var response = await CallEndpoint(tabId, dto);
             
-            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.Equal(HttpStatusCode.Created, response.StatusCode);
         }
 
         private async Task<OrderDto> GetValidDto()

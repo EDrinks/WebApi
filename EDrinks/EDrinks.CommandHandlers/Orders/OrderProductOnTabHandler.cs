@@ -1,12 +1,13 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
-using EDrinks.Common;
 using EDrinks.Events.Orders;
 using EDrinks.EventSource;
+using MediatR;
 
 namespace EDrinks.CommandHandlers.Orders
 {
-    public class OrderProductOnTabCommand : ICommandRequest
+    public class OrderProductOnTabCommand : IRequest<Guid>
     {
         public Guid TabId { get; set; }
 
@@ -15,7 +16,7 @@ namespace EDrinks.CommandHandlers.Orders
         public int Quantity { get; set; }
     }
     
-    public class OrderProductOnTabHandler : CommandHandler<OrderProductOnTabCommand>
+    public class OrderProductOnTabHandler : IRequestHandler<OrderProductOnTabCommand, Guid>
     {
         private readonly IEventSourceFacade _eventSource;
 
@@ -24,17 +25,19 @@ namespace EDrinks.CommandHandlers.Orders
             _eventSource = eventSource;
         }
         
-        protected override async Task<HandlerResult> DoHandle(OrderProductOnTabCommand request)
+        public async Task<Guid> Handle(OrderProductOnTabCommand request, CancellationToken cancellationToken)
         {
+            var orderId = Guid.NewGuid();
+            
             await _eventSource.WriteEvent(new ProductOrderedOnTab()
             {
-                OrderId = Guid.NewGuid(),
+                OrderId = orderId,
                 TabId = request.TabId,
                 ProductId = request.ProductId,
                 Quantity = request.Quantity
             });
 
-            return Ok();
+            return orderId;
         }
     }
 }
