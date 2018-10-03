@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -192,6 +193,18 @@ namespace EDrinks.QueryHandlers
                     Orders.RemoveAll(e => e.TabId == ts.TabId);
                     CurrentSettlement.TabToOrders.RemoveAll(e => e.Tab.Id == ts.TabId);
                     break;
+                case OrderDeleted od:
+                    HandleEvent(od);
+                    break;
+            }
+        }
+
+        private void HandleEvent(OrderDeleted od)
+        {
+            Orders.RemoveAll(e => e.Id == od.OrderId);
+            foreach (var tabToOrders in CurrentSettlement.TabToOrders)
+            {
+                tabToOrders.Orders.RemoveAll(e => e.Id == od.OrderId);
             }
         }
     }

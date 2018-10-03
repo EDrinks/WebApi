@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using EDrinks.CommandHandlers.Orders;
 using EDrinks.Common;
@@ -63,6 +64,27 @@ namespace EDrinks.WebApi.Controllers
                 Quantity = order.Quantity
             });
 
+            return ResultToResponse(result);
+        }
+
+        [Route("Tabs/{tabId}/Orders/{orderId}")]
+        [HttpDelete]
+        public async Task<IActionResult> DeleteOrder([FromRoute] Guid tabId, [FromRoute] Guid orderId)
+        {
+            var tabResult = await _mediator.Send(new GetTabQuery() {TabId = tabId});
+            if (tabResult.ResultCode != ResultCode.Ok) return ResultToResponse(tabResult);
+
+            var ordersResult = await _mediator.Send(new GetOrdersOfTabQuery() {TabId = tabId});
+            if (ordersResult.Payload.All(e => e.Id != orderId))
+            {
+                return NotFound();
+            }
+
+            var result = await _mediator.Send(new DeleteOrderCommand()
+            {
+                OrderId = orderId
+            });
+            
             return ResultToResponse(result);
         }
     }
