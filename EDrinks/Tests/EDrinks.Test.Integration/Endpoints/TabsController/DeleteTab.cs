@@ -2,7 +2,6 @@
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
-using EDrinks.Events.Tabs;
 using Xunit;
 
 namespace EDrinks.Test.Integration.Endpoints.TabsController
@@ -14,7 +13,7 @@ namespace EDrinks.Test.Integration.Endpoints.TabsController
         }
 
         [Fact]
-        public async Task TestNonExistantTab()
+        public async Task TestNonExistentTab()
         {
             var response = await CallEndpoint(Guid.NewGuid());
 
@@ -22,10 +21,20 @@ namespace EDrinks.Test.Integration.Endpoints.TabsController
         }
 
         [Fact]
+        public async Task TestTabWithOpenOrders()
+        {
+            var tabId = await _fixture.Generator.CreateTab();
+            var productId = await _fixture.Generator.CreateProduct();
+            await _fixture.Generator.OrderOnTab(tabId, productId);
+
+            var response = await CallEndpoint(tabId);
+            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        }
+
+        [Fact]
         public async Task TestDeleteTab()
         {
-            var tabId = Guid.NewGuid();
-            await WriteToStream(new TabCreated() {TabId = tabId});
+            var tabId = await _fixture.Generator.CreateTab();
 
             var response = await CallEndpoint(tabId);
 

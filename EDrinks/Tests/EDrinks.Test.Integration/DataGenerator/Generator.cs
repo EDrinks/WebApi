@@ -47,7 +47,7 @@ namespace EDrinks.Test.Integration.DataGenerator
             return productId;
         }
 
-        public async Task<Guid> OrderOnTab(Guid tabId, Guid productId, int quantity)
+        public async Task<Guid> OrderOnTab(Guid tabId, Guid productId, int quantity = 1)
         {
             var orderId = Guid.NewGuid();
 

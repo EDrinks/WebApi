@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using EDrinks.CommandHandlers.Tabs;
 using EDrinks.Common;
+using EDrinks.QueryHandlers.Orders;
 using EDrinks.QueryHandlers.Tabs;
 using EDrinks.WebApi.Attributes;
 using EDrinks.WebApi.Dtos;
@@ -69,6 +71,11 @@ namespace EDrinks.WebApi.Controllers
         {
             var readResult = await _mediator.Send(new GetTabQuery() {TabId = tabId});
             if (readResult.ResultCode != ResultCode.Ok) return ResultToResponse(readResult);
+            var orders = await _mediator.Send(new GetOrdersOfTabQuery() {TabId = tabId});
+            if (orders.Payload.Any())
+            {
+                return BadRequest(new [] {"Cannot delete tab with open orders"});
+            }
 
             var result = await _mediator.Send(new DeleteTabCommand()
             {
