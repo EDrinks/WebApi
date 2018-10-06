@@ -12,16 +12,16 @@ namespace EDrinks.QueryHandlers.Tabs
     
     public class GetTabsHandler: QueryHandler<GetTabsQuery, List<Tab>>
     {
-        private readonly IReadModel _readModel;
+        private readonly IDataContext _dataContext;
 
-        public GetTabsHandler(IReadModel readModel) : base(readModel)
+        public GetTabsHandler(IReadModel readModel, IDataContext dataContext) : base(readModel)
         {
-            _readModel = readModel;
+            _dataContext = dataContext;
         }
         
         protected override async Task<HandlerResult<List<Tab>>> DoHandle(GetTabsQuery request)
         {
-            return Ok((await _readModel.GetTabs()).OrderBy(e => e.Name).ToList());
+            return Ok(_dataContext.Tabs.OrderBy(e => e.Name).ToList());
         }
     }
 }

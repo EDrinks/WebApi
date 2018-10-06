@@ -21,10 +21,12 @@ namespace EDrinks.QueryHandlers.Settlements
     public class GetSettlementsHandler : QueryHandler<GetSettlementsQuery, List<Settlement>>
     {
         private readonly IReadModel _readModel;
+        private readonly IDataContext _dataContext;
 
-        public GetSettlementsHandler(IReadModel readModel) : base(readModel)
+        public GetSettlementsHandler(IReadModel readModel, IDataContext dataContext) : base(readModel)
         {
             _readModel = readModel;
+            _dataContext = dataContext;
         }
         
         protected override async Task<HandlerResult<List<Settlement>>> DoHandle(GetSettlementsQuery request)
@@ -32,7 +34,7 @@ namespace EDrinks.QueryHandlers.Settlements
             var errors = ValidateRequest(request);
             if (errors.Any()) return Error(errors);
 
-            var settlements = (await _readModel.GetSettlements())
+            var settlements = _dataContext.Settlements
                 .OrderByDescending(e => e.DateTime)
                 .Where(e => e.DateTime >= request.Start && e.DateTime <= request.End)
                 .Skip(request.Offset * request.PageSize)

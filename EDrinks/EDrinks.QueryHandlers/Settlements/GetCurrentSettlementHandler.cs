@@ -10,16 +10,16 @@ namespace EDrinks.QueryHandlers.Settlements
     
     public class GetCurrentSettlementHandler : QueryHandler<GetCurrentSettlementQuery, Settlement>
     {
-        private readonly IReadModel _readModel;
+        private readonly IDataContext _dataContext;
 
-        public GetCurrentSettlementHandler(IReadModel readModel) : base(readModel)
+        public GetCurrentSettlementHandler(IReadModel readModel, IDataContext dataContext) : base(readModel)
         {
-            _readModel = readModel;
+            _dataContext = dataContext;
         }
         
         protected override async Task<HandlerResult<Settlement>> DoHandle(GetCurrentSettlementQuery request)
         {
-            return Ok(await _readModel.GetCurrentSettlement());
+            return Ok(_dataContext.CurrentSettlement);
         }
     }
 }

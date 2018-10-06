@@ -14,18 +14,16 @@ namespace EDrinks.QueryHandlers.Orders
 
     public class GetOrdersOfTabHandler : QueryHandler<GetOrdersOfTabQuery, List<Order>>
     {
-        private readonly IReadModel _readModel;
+        private readonly IDataContext _dataContext;
 
-        public GetOrdersOfTabHandler(IReadModel readModel) : base(readModel)
+        public GetOrdersOfTabHandler(IReadModel readModel, IDataContext dataContext) : base(readModel)
         {
-            _readModel = readModel;
+            _dataContext = dataContext;
         }
 
         protected override async Task<HandlerResult<List<Order>>> DoHandle(GetOrdersOfTabQuery request)
         {
-            var allOrders = await _readModel.GetOrders();
-
-            return Ok(allOrders.Where(e => e.TabId == request.TabId).ToList());
+            return Ok(_dataContext.Orders.Where(e => e.TabId == request.TabId).ToList());
         }
     }
 }

@@ -11,16 +11,16 @@ namespace EDrinks.QueryHandlers.Orders
 
     public class GetCurrentOrdersHandler : QueryHandler<GetCurrentOrdersQuery, List<Order>>
     {
-        private readonly IReadModel _readModel;
+        private readonly IDataContext _dataContext;
 
-        public GetCurrentOrdersHandler(IReadModel readModel) : base(readModel)
+        public GetCurrentOrdersHandler(IReadModel readModel, IDataContext dataContext) : base(readModel)
         {
-            _readModel = readModel;
+            _dataContext = dataContext;
         }
         
         protected override async Task<HandlerResult<List<Order>>> DoHandle(GetCurrentOrdersQuery request)
         {
-            return Ok(await _readModel.GetOrders());
+            return Ok(_dataContext.Orders);
         }
     }
 }

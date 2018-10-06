@@ -7,6 +7,7 @@ using EDrinks.Common.Config;
 using EDrinks.Events;
 using EDrinks.EventSource;
 using EDrinks.QueryHandlers;
+using EDrinks.QueryHandlers.Model;
 using EDrinks.WebApi.Services;
 using EventStore.ClientAPI;
 using MediatR;
@@ -50,6 +51,7 @@ namespace EDrinks.WebApi
             });
             services.AddScoped<IEventSourceFacade, EventSourceFacade>();
             services.AddScoped<IReadModel, ReadModel>();
+            services.AddScoped<IDataContext, DataContext>();
             services.AddSingleton<IEventLookup, EventLookup>();
 
             var assemblies = (new[] {"EDrinks.QueryHandlers", "EDrinks.CommandHandlers"})

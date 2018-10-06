@@ -13,16 +13,16 @@ namespace EDrinks.QueryHandlers.Products
     
     public class GetProductHandler : QueryHandler<GetProductQuery, Product>
     {
-        private readonly IReadModel _readModel;
+        private readonly IDataContext _dataContext;
 
-        public GetProductHandler(IReadModel readModel) : base(readModel)
+        public GetProductHandler(IReadModel readModel, IDataContext dataContext) : base(readModel)
         {
-            _readModel = readModel;
+            _dataContext = dataContext;
         }
         
         protected override async Task<HandlerResult<Product>> DoHandle(GetProductQuery request)
         {
-            var product = (await _readModel.GetProducts()).FirstOrDefault(e => e.Id == request.Id);
+            var product = _dataContext.Products.FirstOrDefault(e => e.Id == request.Id);
 
             return product != null ? Ok(product) : NotFound();
         }
