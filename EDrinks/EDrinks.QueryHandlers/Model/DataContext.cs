@@ -8,7 +8,9 @@ namespace EDrinks.QueryHandlers.Model
         
         List<Tab> Tabs { get; set; }
         
-        List<Order> Orders { get; set; }
+        List<Order> CurrentOrders { get; set; }
+        
+        List<Order> AllOrders { get; set; }
         
         List<Settlement> Settlements { get; set; }
         
@@ -21,7 +23,9 @@ namespace EDrinks.QueryHandlers.Model
         
         public List<Tab> Tabs { get; set; } = new List<Tab>();
         
-        public List<Order> Orders { get; set; } = new List<Order>();
+        public List<Order> CurrentOrders { get; set; } = new List<Order>();
+        
+        public List<Order> AllOrders { get; set; } = new List<Order>();
         
         public List<Settlement> Settlements { get; set; } = new List<Settlement>();
         

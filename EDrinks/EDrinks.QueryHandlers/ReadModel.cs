@@ -47,7 +47,7 @@ namespace EDrinks.QueryHandlers
         {
             _eventHandlers.Add(handler);
         }
-        
+
         public async Task ApplyAllEvents()
         {
             if (_eventsLoaded) return;
@@ -117,49 +117,10 @@ namespace EDrinks.QueryHandlers
                     _dataContext.Tabs.RemoveAll(e => e.Id == td.TabId);
                     break;
                 case ProductOrderedOnTab poot:
-                    var order = new Order()
-                    {
-                        Id = poot.OrderId,
-                        ProductId = poot.ProductId,
-                        TabId = poot.TabId,
-                        Quantity = poot.Quantity,
-                        DateTime = poot.MetaData.CreatedOn,
-                        ProductPrice = _dataContext.Products.FirstOrDefault(e => e.Id == poot.ProductId)?.Price ?? 0
-                    };
-
-                    _dataContext.Orders.Add(order);
-
-                    if (_dataContext.CurrentSettlement.TabToOrders.All(e => e.Tab.Id != poot.TabId))
-                    {
-                        _dataContext.CurrentSettlement.TabToOrders.Add(new TabToOrders()
-                        {
-                            Tab = _dataContext.Tabs.FirstOrDefault(e => e.Id == poot.TabId)
-                        });
-                    }
-
-                    var tabToOrders = _dataContext.CurrentSettlement.TabToOrders.Single(e => e.Tab.Id == poot.TabId);
-                    tabToOrders.Orders.Add(order);
+                    HandleEvent(poot);
                     break;
                 case TabSettled ts:
-                    if (_dataContext.Settlements.All(e => e.Id != ts.SettlementId))
-                    {
-                        _dataContext.Settlements.Add(new Settlement()
-                        {
-                            Id = ts.SettlementId,
-                            DateTime = ts.MetaData.CreatedOn
-                        });
-                    }
-
-                    var settlement = _dataContext.Settlements.Single(e => e.Id == ts.SettlementId);
-                    var orders = _dataContext.Orders.Where(e => e.TabId == ts.TabId);
-                    settlement.TabToOrders.Add(new TabToOrders()
-                    {
-                        Tab = _dataContext.Tabs.FirstOrDefault(e => e.Id == ts.TabId),
-                        Orders = orders.ToList()
-                    });
-
-                    _dataContext.Orders.RemoveAll(e => e.TabId == ts.TabId);
-                    _dataContext.CurrentSettlement.TabToOrders.RemoveAll(e => e.Tab.Id == ts.TabId);
+                    HandleEvent(ts);
                     break;
                 case OrderDeleted od:
                     HandleEvent(od);
@@ -167,14 +128,64 @@ namespace EDrinks.QueryHandlers
             }
         }
 
+        private void HandleEvent(ProductOrderedOnTab poot)
+        {
+            var order = new Order()
+            {
+                Id = poot.OrderId,
+                ProductId = poot.ProductId,
+                TabId = poot.TabId,
+                Quantity = poot.Quantity,
+                DateTime = poot.MetaData.CreatedOn,
+                ProductPrice = _dataContext.Products.FirstOrDefault(e => e.Id == poot.ProductId)?.Price ?? 0
+            };
+
+            _dataContext.CurrentOrders.Add(order);
+            _dataContext.AllOrders.Add(order);
+
+            if (_dataContext.CurrentSettlement.TabToOrders.All(e => e.Tab.Id != poot.TabId))
+            {
+                _dataContext.CurrentSettlement.TabToOrders.Add(new TabToOrders()
+                {
+                    Tab = _dataContext.Tabs.FirstOrDefault(e => e.Id == poot.TabId)
+                });
+            }
+
+            var tabToOrders = _dataContext.CurrentSettlement.TabToOrders.Single(e => e.Tab.Id == poot.TabId);
+            tabToOrders.Orders.Add(order);
+        }
+
+        private void HandleEvent(TabSettled ts)
+        {
+            if (_dataContext.Settlements.All(e => e.Id != ts.SettlementId))
+            {
+                _dataContext.Settlements.Add(new Settlement()
+                {
+                    Id = ts.SettlementId,
+                    DateTime = ts.MetaData.CreatedOn
+                });
+            }
+
+            var settlement = _dataContext.Settlements.Single(e => e.Id == ts.SettlementId);
+            var orders = _dataContext.CurrentOrders.Where(e => e.TabId == ts.TabId);
+            settlement.TabToOrders.Add(new TabToOrders()
+            {
+                Tab = _dataContext.Tabs.FirstOrDefault(e => e.Id == ts.TabId),
+                Orders = orders.ToList()
+            });
+
+            _dataContext.CurrentOrders.RemoveAll(e => e.TabId == ts.TabId);
+            _dataContext.CurrentSettlement.TabToOrders.RemoveAll(e => e.Tab.Id == ts.TabId);
+        }
+
         private void HandleEvent(OrderDeleted od)
         {
-            _dataContext.Orders.RemoveAll(e => e.Id == od.OrderId);
+            _dataContext.CurrentOrders.RemoveAll(e => e.Id == od.OrderId);
+            _dataContext.AllOrders.RemoveAll(e => e.Id == od.OrderId);
             foreach (var tabToOrders in _dataContext.CurrentSettlement.TabToOrders)
             {
                 tabToOrders.Orders.RemoveAll(e => e.Id == od.OrderId);
             }
         }
-
     }
 }

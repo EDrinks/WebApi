@@ -20,7 +20,7 @@ namespace EDrinks.QueryHandlers.Orders
         
         protected override async Task<HandlerResult<List<Order>>> DoHandle(GetCurrentOrdersQuery request)
         {
-            return Ok(_dataContext.Orders);
+            return Ok(_dataContext.CurrentOrders);
         }
     }
 }

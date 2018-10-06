@@ -23,7 +23,7 @@ namespace EDrinks.QueryHandlers.Orders
 
         protected override async Task<HandlerResult<List<Order>>> DoHandle(GetOrdersOfTabQuery request)
         {
-            return Ok(_dataContext.Orders.Where(e => e.TabId == request.TabId).ToList());
+            return Ok(_dataContext.CurrentOrders.Where(e => e.TabId == request.TabId).ToList());
         }
     }
 }
