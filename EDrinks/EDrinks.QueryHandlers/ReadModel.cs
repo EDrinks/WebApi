@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -26,6 +25,10 @@ namespace EDrinks.QueryHandlers
         Task<List<Settlement>> GetSettlements();
 
         Task<Settlement> GetCurrentSettlement();
+
+        void RegisterHandler(Action<BaseEvent> handler);
+
+        Task ApplyAllEvents();
     }
 
     public class ReadModel : IReadModel
@@ -41,6 +44,8 @@ namespace EDrinks.QueryHandlers
         private List<Order> Orders { get; set; }
         private Dictionary<Guid, Settlement> Settlements { get; set; }
         private Settlement CurrentSettlement;
+        
+        private List<Action<BaseEvent>> _eventHandlers;
 
         public ReadModel(IEventStoreConnection connection, IStreamResolver streamResolver, IEventLookup eventLookup)
         {
@@ -53,6 +58,7 @@ namespace EDrinks.QueryHandlers
             Orders = new List<Order>();
             Settlements = new Dictionary<Guid, Settlement>();
             CurrentSettlement = new Settlement();
+            _eventHandlers = new List<Action<BaseEvent>>();
         }
 
         public async Task<List<Product>> GetProducts()
@@ -85,7 +91,12 @@ namespace EDrinks.QueryHandlers
             return CurrentSettlement;
         }
 
-        private async Task ApplyAllEvents()
+        public void RegisterHandler(Action<BaseEvent> handler)
+        {
+            _eventHandlers.Add(handler);
+        }
+        
+        public async Task ApplyAllEvents()
         {
             if (_eventsLoaded) return;
 
@@ -113,6 +124,11 @@ namespace EDrinks.QueryHandlers
                     var obj = (BaseEvent) JsonConvert.DeserializeObject(data, eventType);
                     obj.MetaData = JsonConvert.DeserializeObject<MetaData>(metaData);
                     await EventAppeared(obj);
+
+                    foreach (var eventHandler in _eventHandlers)
+                    {
+                        eventHandler(obj);
+                    }
                 }
             }
 
@@ -207,5 +223,6 @@ namespace EDrinks.QueryHandlers
                 tabToOrders.Orders.RemoveAll(e => e.Id == od.OrderId);
             }
         }
+
     }
 }

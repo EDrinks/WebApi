@@ -13,7 +13,7 @@ namespace EDrinks.QueryHandlers.Orders
     {
         private readonly IReadModel _readModel;
 
-        public GetCurrentOrdersHandler(IReadModel readModel)
+        public GetCurrentOrdersHandler(IReadModel readModel) : base(readModel)
         {
             _readModel = readModel;
         }

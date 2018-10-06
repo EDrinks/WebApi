@@ -1,9 +1,9 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using EDrinks.Common;
+using EDrinks.Events;
 using MediatR;
 
 namespace EDrinks.QueryHandlers
@@ -11,12 +11,26 @@ namespace EDrinks.QueryHandlers
     public abstract class QueryHandler<TRequest, TReturn> : IRequestHandler<TRequest, HandlerResult<TReturn>>
         where TRequest : IQueryRequest<TReturn>
     {
+        private readonly IReadModel _readModel;
+
+        public QueryHandler(IReadModel readModel)
+        {
+            _readModel = readModel;
+            readModel.RegisterHandler(HandleEvent);
+        }
+        
         public async Task<HandlerResult<TReturn>> Handle(TRequest request, CancellationToken cancellationToken)
         {
+            await _readModel.ApplyAllEvents();
             return await DoHandle(request);
         }
 
         protected abstract Task<HandlerResult<TReturn>> DoHandle(TRequest request);
+
+        protected virtual void HandleEvent(BaseEvent baseEvent)
+        {
+            
+        }
 
         protected HandlerResult<TReturn> Ok(TReturn payload)
         {

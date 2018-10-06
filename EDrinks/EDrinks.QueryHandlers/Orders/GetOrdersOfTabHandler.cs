@@ -16,7 +16,7 @@ namespace EDrinks.QueryHandlers.Orders
     {
         private readonly IReadModel _readModel;
 
-        public GetOrdersOfTabHandler(IReadModel readModel)
+        public GetOrdersOfTabHandler(IReadModel readModel) : base(readModel)
         {
             _readModel = readModel;
         }

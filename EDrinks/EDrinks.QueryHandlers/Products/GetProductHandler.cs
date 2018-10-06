@@ -15,7 +15,7 @@ namespace EDrinks.QueryHandlers.Products
     {
         private readonly IReadModel _readModel;
 
-        public GetProductHandler(IReadModel readModel)
+        public GetProductHandler(IReadModel readModel) : base(readModel)
         {
             _readModel = readModel;
         }

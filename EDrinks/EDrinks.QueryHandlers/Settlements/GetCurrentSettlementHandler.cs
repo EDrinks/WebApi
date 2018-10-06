@@ -12,7 +12,7 @@ namespace EDrinks.QueryHandlers.Settlements
     {
         private readonly IReadModel _readModel;
 
-        public GetCurrentSettlementHandler(IReadModel readModel)
+        public GetCurrentSettlementHandler(IReadModel readModel) : base(readModel)
         {
             _readModel = readModel;
         }

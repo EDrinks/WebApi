@@ -15,7 +15,7 @@ namespace EDrinks.QueryHandlers.Settlements
     {
         private readonly IReadModel _readModel;
 
-        public GetSettlementHandler(IReadModel readModel)
+        public GetSettlementHandler(IReadModel readModel) : base(readModel)
         {
             _readModel = readModel;
         }

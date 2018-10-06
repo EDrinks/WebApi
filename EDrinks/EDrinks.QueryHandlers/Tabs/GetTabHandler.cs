@@ -15,7 +15,7 @@ namespace EDrinks.QueryHandlers.Tabs
     {
         private readonly IReadModel _readModel;
 
-        public GetTabHandler(IReadModel readModel)
+        public GetTabHandler(IReadModel readModel) : base(readModel)
         {
             _readModel = readModel;
         }
