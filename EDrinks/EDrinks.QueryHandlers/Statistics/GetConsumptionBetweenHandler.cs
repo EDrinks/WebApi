@@ -43,9 +43,7 @@ namespace EDrinks.QueryHandlers.Statistics
             {
                 var date = currentDate;
                 var quantity = _dataContext.AllOrders
-                    .Where(e => e.DateTime >= date.AddHours(-12)
-                                && e.DateTime < date.AddHours(12)
-                                && e.ProductId == request.ProductId)
+                    .Where(e => e.DateTime.Date == date && e.ProductId == request.ProductId)
                     .Sum(e => e.Quantity);
                 
                 dataPoints.Add(new DataPoint()
