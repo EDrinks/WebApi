@@ -27,5 +27,19 @@ namespace EDrinks.WebApi.Controllers
             
             return ResultToResponse(result);
         }
+
+        [HttpGet("ConsumptionBetween")]
+        public async Task<IActionResult> GetConsumptionBetween([FromQuery] Guid productId, [FromQuery] DateTime start,
+            [FromQuery] DateTime end)
+        {
+            var result = await _mediator.Send(new GetConsumptionBetweenQuery()
+            {
+                ProductId = productId,
+                Start = start,
+                End = end
+            });
+
+            return ResultToResponse(result);
+        }
     }
 }

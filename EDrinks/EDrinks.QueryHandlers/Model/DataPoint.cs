@@ -1,6 +1,6 @@
 namespace EDrinks.QueryHandlers.Model
 {
-    public class BarChartEntry
+    public class DataPoint
     {
         public string Label { get; set; }
 

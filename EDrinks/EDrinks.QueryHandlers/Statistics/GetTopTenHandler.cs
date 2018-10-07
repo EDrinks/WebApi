@@ -7,14 +7,14 @@ using EDrinks.QueryHandlers.Model;
 
 namespace EDrinks.QueryHandlers.Statistics
 {
-    public class GetTopTenQuery : IQueryRequest<List<BarChartEntry>>
+    public class GetTopTenQuery : IQueryRequest<List<DataPoint>>
     {
         public Guid ProductId { get; set; }
 
         public bool Current { get; set; }
     }
     
-    public class GetTopTenHandler : QueryHandler<GetTopTenQuery, List<BarChartEntry>>
+    public class GetTopTenHandler : QueryHandler<GetTopTenQuery, List<DataPoint>>
     {
         private readonly IDataContext _dataContext;
         
@@ -23,13 +23,13 @@ namespace EDrinks.QueryHandlers.Statistics
             _dataContext = dataContext;
         }
 
-        protected override async Task<HandlerResult<List<BarChartEntry>>> DoHandle(GetTopTenQuery request)
+        protected override async Task<HandlerResult<List<DataPoint>>> DoHandle(GetTopTenQuery request)
         {
             var orderCollection = request.Current ? _dataContext.CurrentOrders : _dataContext.AllOrders;
             
             var topTen = orderCollection.Where(e => e.ProductId == request.ProductId)
                 .GroupBy(e => e.TabId)
-                .Select(e => new BarChartEntry()
+                .Select(e => new DataPoint()
                 {
                     Label = _dataContext.Tabs.First(tab => tab.Id == e.Key).Name,
                     Value = e.Sum(o => o.Quantity)

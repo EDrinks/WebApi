@@ -21,7 +21,7 @@ namespace EDrinks.Test.Integration.Endpoints.StatisticsController
 
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
-            var entries = await Deserialize<List<BarChartEntry>>(response);
+            var entries = await Deserialize<List<DataPoint>>(response);
             Assert.Empty(entries);
         }
 
@@ -38,7 +38,7 @@ namespace EDrinks.Test.Integration.Endpoints.StatisticsController
 
             var response = await CallEndpoint(productId, true);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-            var entries = await Deserialize<List<BarChartEntry>>(response);
+            var entries = await Deserialize<List<DataPoint>>(response);
             Assert.Single(entries);
         }
         
@@ -55,7 +55,7 @@ namespace EDrinks.Test.Integration.Endpoints.StatisticsController
 
             var response = await CallEndpoint(productId, false);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-            var entries = await Deserialize<List<BarChartEntry>>(response);
+            var entries = await Deserialize<List<DataPoint>>(response);
             Assert.Equal(2, entries.Count);
         }
 

@@ -49,6 +49,11 @@ namespace EDrinks.QueryHandlers
                 ErrorMessages = errorMessages.ToList()
             };
         }
+        
+        protected HandlerResult<TReturn> Error(string errorMessage)
+        {
+            return Error(new[] {errorMessage});
+        }
 
         protected HandlerResult<TReturn> NotFound()
         {
