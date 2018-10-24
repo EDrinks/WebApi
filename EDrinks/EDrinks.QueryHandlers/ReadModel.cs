@@ -132,6 +132,9 @@ namespace EDrinks.QueryHandlers
                 case ProductOrderedOnSpending poos:
                     HandleEvent(poos);
                     break;
+                case SpendingClosed sc:
+                    HandleEvent(sc);
+                    break;
             }
         }
 
@@ -211,6 +214,11 @@ namespace EDrinks.QueryHandlers
         {
             var spending = _dataContext.Spendings.First(e => e.Id == poos.SpendingId);
             spending.Current += poos.Quantity;
+        }
+        
+        private void HandleEvent(SpendingClosed sc)
+        {
+            _dataContext.Spendings.RemoveAll(e => e.Id == sc.SpendingId);
         }
     }
 }
