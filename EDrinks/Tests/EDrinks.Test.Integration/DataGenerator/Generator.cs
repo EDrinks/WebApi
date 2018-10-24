@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading;
@@ -8,6 +7,7 @@ using Bogus;
 using EDrinks.Events;
 using EDrinks.Events.Orders;
 using EDrinks.Events.Products;
+using EDrinks.Events.Spendings;
 using EDrinks.Events.Tabs;
 using EventStore.ClientAPI;
 using Newtonsoft.Json;
@@ -76,6 +76,21 @@ namespace EDrinks.Test.Integration.DataGenerator
             }
 
             return settlementId;
+        }
+
+        public async Task<Guid> CreateSpending(Guid tabId, Guid productId, int quantity)
+        {
+            var spendingId = Guid.NewGuid();
+
+            await WriteToStream(new SpendingCreated()
+            {
+                SpendingId = spendingId,
+                TabId = tabId,
+                ProductId = productId,
+                Quantity = quantity
+            });
+
+            return spendingId;
         }
 
         private async Task WriteToStream(BaseEvent evt)

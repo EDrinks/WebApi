@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using EDrinks.CommandHandlers.Spendings;
 using EDrinks.Common;
 using EDrinks.QueryHandlers.Products;
+using EDrinks.QueryHandlers.Spendings;
 using EDrinks.QueryHandlers.Tabs;
 using EDrinks.WebApi.Attributes;
 using MediatR;
@@ -18,6 +19,14 @@ namespace EDrinks.WebApi.Controllers
         public SpendingsController(IMediator mediator)
         {
             _mediator = mediator;
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetSpendings()
+        {
+            var result = await _mediator.Send(new GetSpendingsQuery());
+            
+            return ResultToResponse(result);
         }
 
         [HttpPost]

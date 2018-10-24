@@ -3,7 +3,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using EDrinks.Common;
-using EDrinks.Events;
 using MediatR;
 
 namespace EDrinks.QueryHandlers
@@ -16,7 +15,6 @@ namespace EDrinks.QueryHandlers
         public QueryHandler(IReadModel readModel)
         {
             _readModel = readModel;
-            readModel.RegisterHandler(HandleEvent);
         }
         
         public async Task<HandlerResult<TReturn>> Handle(TRequest request, CancellationToken cancellationToken)
@@ -26,11 +24,6 @@ namespace EDrinks.QueryHandlers
         }
 
         protected abstract Task<HandlerResult<TReturn>> DoHandle(TRequest request);
-
-        protected virtual void HandleEvent(BaseEvent baseEvent)
-        {
-            
-        }
 
         protected HandlerResult<TReturn> Ok(TReturn payload)
         {
