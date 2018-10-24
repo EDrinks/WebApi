@@ -7,9 +7,9 @@ using Xunit;
 
 namespace EDrinks.Test.Integration.Endpoints.SpendingsController
 {
-    public class CreateSpending : ServiceTest
+    public class PostSpending : ServiceTest
     {
-        public CreateSpending(ServiceFixture fixture) : base(fixture)
+        public PostSpending(ServiceFixture fixture) : base(fixture)
         {
         }
 
