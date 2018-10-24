@@ -132,8 +132,8 @@ namespace EDrinks.QueryHandlers
                 case ProductOrderedOnSpending poos:
                     HandleEvent(poos);
                     break;
-                case SpendingClosed sc:
-                    HandleEvent(sc);
+                case OrderOnSpendingDeleted oosd:
+                    HandleEvent(oosd);
                     break;
             }
         }
@@ -214,11 +214,30 @@ namespace EDrinks.QueryHandlers
         {
             var spending = _dataContext.Spendings.First(e => e.Id == poos.SpendingId);
             spending.Current += poos.Quantity;
+            
+            // for settlements and everything just handle this as an normal order
+            HandleEvent(new ProductOrderedOnTab()
+            {
+                TabId = spending.TabId,
+                ProductId = spending.ProductId,
+                Quantity = poos.Quantity,
+                OrderId = poos.OrderId,
+                MetaData = poos.MetaData
+            });
         }
-        
-        private void HandleEvent(SpendingClosed sc)
+
+        private void HandleEvent(OrderOnSpendingDeleted ooos)
         {
-            _dataContext.Spendings.RemoveAll(e => e.Id == sc.SpendingId);
+            var spending = _dataContext.Spendings.First(e => e.Id == ooos.SpendingId);
+            var order = _dataContext.CurrentOrders.First(e => e.Id == ooos.OrderId);
+
+            spending.Current -= order.Quantity;
+            
+            HandleEvent(new OrderDeleted()
+            {
+                OrderId = ooos.OrderId,
+                MetaData = ooos.MetaData
+            });
         }
     }
 }

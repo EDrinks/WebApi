@@ -12,6 +12,8 @@ namespace EDrinks.QueryHandlers.Model
 
         public Guid TabId { get; set; }
 
+        public Guid? SpendingId { get; set; }
+
         public int Quantity { get; set; }
 
         public decimal ProductPrice { get; set; }
