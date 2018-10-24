@@ -7,6 +7,7 @@ using EDrinks.Common;
 using EDrinks.Events;
 using EDrinks.Events.Orders;
 using EDrinks.Events.Products;
+using EDrinks.Events.Spendings;
 using EDrinks.Events.Tabs;
 using EDrinks.QueryHandlers.Model;
 using EventStore.ClientAPI;
@@ -125,6 +126,12 @@ namespace EDrinks.QueryHandlers
                 case OrderDeleted od:
                     HandleEvent(od);
                     break;
+                case SpendingCreated sc:
+                    HandleEvent(sc);
+                    break;
+                case ProductOrderedOnSpending poos:
+                    HandleEvent(poos);
+                    break;
             }
         }
 
@@ -186,6 +193,24 @@ namespace EDrinks.QueryHandlers
             {
                 tabToOrders.Orders.RemoveAll(e => e.Id == od.OrderId);
             }
+        }
+
+        private void HandleEvent(SpendingCreated sc)
+        {
+            _dataContext.Spendings.Add(new Spending()
+            {
+                Id = sc.SpendingId,
+                TabId = sc.TabId,
+                ProductId = sc.ProductId,
+                Quantity = sc.Quantity,
+                Current = 0
+            });
+        }
+
+        private void HandleEvent(ProductOrderedOnSpending poos)
+        {
+            var spending = _dataContext.Spendings.First(e => e.Id == poos.SpendingId);
+            spending.Current += poos.Quantity;
         }
     }
 }

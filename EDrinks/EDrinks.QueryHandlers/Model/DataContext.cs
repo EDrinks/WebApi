@@ -15,6 +15,8 @@ namespace EDrinks.QueryHandlers.Model
         List<Settlement> Settlements { get; set; }
         
         Settlement CurrentSettlement { get; set; }
+
+        List<Spending> Spendings { get; set; }
     }
     
     public class DataContext : IDataContext
@@ -30,5 +32,7 @@ namespace EDrinks.QueryHandlers.Model
         public List<Settlement> Settlements { get; set; } = new List<Settlement>();
         
         public Settlement CurrentSettlement { get; set; } = new Settlement();
+        
+        public List<Spending> Spendings { get; set; } = new List<Spending>();
     }
 }

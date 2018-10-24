@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using EDrinks.CommandHandlers.Spendings;
 using EDrinks.Common;
@@ -44,6 +45,12 @@ namespace EDrinks.WebApi.Controllers
             var spendingId = await _mediator.Send(command);
             
             return Created($"/api/Tabs/{spendingId}", spendingId);
+        }
+
+        [HttpPost("{spendingId}")]
+        public async Task<IActionResult> DeleteSpending(Guid spendingId)
+        {
+            return null;
         }
     }
 }
