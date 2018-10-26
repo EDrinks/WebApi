@@ -56,6 +56,29 @@ namespace EDrinks.WebApi.Controllers
             return Created($"/api/Tabs/{spendingId}", spendingId);
         }
 
+        [HttpPost("{spendingId}/Orders")]
+        [ValidateModel]
+        public async Task<IActionResult> CreateOrderOnSpending([FromRoute] Guid spendingId, 
+            [FromBody] OrderOnSpendingCommand command)
+        {
+            var spending = await _mediator.Send(new GetSpendingQuery() {SpendingId = spendingId});
+
+            if (spending.ResultCode == ResultCode.NotFound)
+            {
+                return NotFound();
+            }
+
+            if (spending.Payload.Current + command.Quantity > spending.Payload.Quantity)
+            {
+                return BadRequest("Order exceeds spending amount");
+            }
+
+            command.SpendingId = spendingId;
+            await _mediator.Send(command);
+            
+            return Ok();
+        }
+
         [HttpPost("{spendingId}")]
         public async Task<IActionResult> DeleteSpending(Guid spendingId)
         {
