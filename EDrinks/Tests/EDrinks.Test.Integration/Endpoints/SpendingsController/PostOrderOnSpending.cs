@@ -64,7 +64,9 @@ namespace EDrinks.Test.Integration.Endpoints.SpendingsController
 
             var response = await CallEndpoint(spendingId, new {quantity = 1});
             
-            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+            var orderId = await Deserialize<string>(response);
+            Assert.False(string.IsNullOrEmpty(orderId));
         }
 
         private async Task<Guid> CreateSpending(int quantity = 10)

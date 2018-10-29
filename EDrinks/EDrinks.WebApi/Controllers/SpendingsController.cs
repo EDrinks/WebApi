@@ -85,9 +85,9 @@ namespace EDrinks.WebApi.Controllers
             }
 
             command.SpendingId = spendingId;
-            await _mediator.Send(command);
-            
-            return Ok();
+            var orderId = await _mediator.Send(command);
+
+            return Created($"/api/Orders/{orderId}", orderId);
         }
 
         [HttpPost("{spendingId}")]

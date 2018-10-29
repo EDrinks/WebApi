@@ -8,7 +8,7 @@ using MediatR;
 
 namespace EDrinks.CommandHandlers.Spendings
 {
-    public class OrderOnSpendingCommand : IRequest
+    public class OrderOnSpendingCommand : IRequest<Guid>
     {
         public Guid SpendingId { get; set; }
         
@@ -16,7 +16,7 @@ namespace EDrinks.CommandHandlers.Spendings
         public int Quantity { get; set; }
     }
     
-    public class OrderOnSpendingHandler : AsyncRequestHandler<OrderOnSpendingCommand>
+    public class OrderOnSpendingHandler : IRequestHandler<OrderOnSpendingCommand, Guid>
     {
         private readonly IEventSourceFacade _eventSource;
 
@@ -25,14 +25,18 @@ namespace EDrinks.CommandHandlers.Spendings
             _eventSource = eventSource;
         }
         
-        protected override async Task Handle(OrderOnSpendingCommand request, CancellationToken cancellationToken)
+        public async Task<Guid> Handle(OrderOnSpendingCommand request, CancellationToken cancellationToken)
         {
+            var orderId = Guid.NewGuid();
+            
             await _eventSource.WriteEvent(new ProductOrderedOnSpending()
             {
-                OrderId = Guid.NewGuid(),
+                OrderId = orderId,
                 SpendingId = request.SpendingId,
                 Quantity = request.Quantity
             });
+
+            return orderId;
         }
     }
 }
