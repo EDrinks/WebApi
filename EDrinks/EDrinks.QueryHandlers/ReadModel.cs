@@ -138,7 +138,7 @@ namespace EDrinks.QueryHandlers
             }
         }
 
-        private void HandleEvent(ProductOrderedOnTab poot)
+        private void HandleEvent(ProductOrderedOnTab poot, Guid? spendingId = null)
         {
             var order = new Order()
             {
@@ -147,7 +147,8 @@ namespace EDrinks.QueryHandlers
                 TabId = poot.TabId,
                 Quantity = poot.Quantity,
                 DateTime = poot.MetaData.CreatedOn,
-                ProductPrice = _dataContext.Products.FirstOrDefault(e => e.Id == poot.ProductId)?.Price ?? 0
+                ProductPrice = _dataContext.Products.FirstOrDefault(e => e.Id == poot.ProductId)?.Price ?? 0,
+                SpendingId = spendingId
             };
 
             _dataContext.CurrentOrders.Add(order);
@@ -190,6 +191,13 @@ namespace EDrinks.QueryHandlers
 
         private void HandleEvent(OrderDeleted od)
         {
+            var order = _dataContext.AllOrders.FirstOrDefault(e => e.Id == od.OrderId);
+            if (order != null && order.SpendingId.HasValue)
+            {
+                var spending = _dataContext.Spendings.First(e => e.Id == order.SpendingId);
+                spending.Current -= order.Quantity;
+            }
+            
             _dataContext.CurrentOrders.RemoveAll(e => e.Id == od.OrderId);
             _dataContext.AllOrders.RemoveAll(e => e.Id == od.OrderId);
             foreach (var tabToOrders in _dataContext.CurrentSettlement.TabToOrders)
@@ -223,7 +231,7 @@ namespace EDrinks.QueryHandlers
                 Quantity = poos.Quantity,
                 OrderId = poos.OrderId,
                 MetaData = poos.MetaData
-            });
+            }, spending.Id);
         }
 
         private void HandleEvent(OrderOnSpendingDeleted ooos)
