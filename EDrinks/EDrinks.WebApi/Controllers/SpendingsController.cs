@@ -29,6 +29,17 @@ namespace EDrinks.WebApi.Controllers
             return ResultToResponse(result);
         }
 
+        [HttpGet("{spendingId}")]
+        public async Task<IActionResult> GetSpending([FromRoute] Guid spendingId)
+        {
+            var result = await _mediator.Send(new GetSpendingQuery()
+            {
+                SpendingId = spendingId
+            });
+            
+            return ResultToResponse(result);
+        }
+
         [HttpPost]
         [ValidateModel]
         public async Task<IActionResult> CreateSpending([FromBody] CreateSpendingCommand command)
