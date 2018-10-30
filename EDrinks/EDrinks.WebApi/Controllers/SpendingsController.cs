@@ -25,7 +25,7 @@ namespace EDrinks.WebApi.Controllers
         public async Task<IActionResult> GetSpendings()
         {
             var result = await _mediator.Send(new GetSpendingsQuery());
-            
+
             return ResultToResponse(result);
         }
 
@@ -36,7 +36,7 @@ namespace EDrinks.WebApi.Controllers
             {
                 SpendingId = spendingId
             });
-            
+
             return ResultToResponse(result);
         }
 
@@ -63,13 +63,13 @@ namespace EDrinks.WebApi.Controllers
             }
 
             var spendingId = await _mediator.Send(command);
-            
+
             return Created($"/api/Tabs/{spendingId}", spendingId);
         }
 
         [HttpPost("{spendingId}/Orders")]
         [ValidateModel]
-        public async Task<IActionResult> CreateOrderOnSpending([FromRoute] Guid spendingId, 
+        public async Task<IActionResult> CreateOrderOnSpending([FromRoute] Guid spendingId,
             [FromBody] OrderOnSpendingCommand command)
         {
             var spending = await _mediator.Send(new GetSpendingQuery() {SpendingId = spendingId});
@@ -97,14 +97,29 @@ namespace EDrinks.WebApi.Controllers
             {
                 SpendingId = spendingId
             });
-            
+
             return ResultToResponse(result);
         }
 
-        [HttpPost("{spendingId}")]
+        [HttpDelete("{spendingId}")]
         public async Task<IActionResult> DeleteSpending(Guid spendingId)
         {
-            return null;
+            var spendingResult = await _mediator.Send(new GetSpendingQuery()
+            {
+                SpendingId = spendingId
+            });
+
+            if (spendingResult.ResultCode != ResultCode.Ok)
+            {
+                return NotFound();
+            }
+            
+            await _mediator.Send(new CloseSpendingCommand()
+            {
+                SpendingId = spendingId
+            });
+
+            return Ok();
         }
     }
 }
