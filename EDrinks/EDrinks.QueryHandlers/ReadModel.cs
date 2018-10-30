@@ -135,6 +135,9 @@ namespace EDrinks.QueryHandlers
                 case OrderOnSpendingDeleted oosd:
                     HandleEvent(oosd);
                     break;
+                case SpendingClosed sc:
+                    HandleEvent(sc);
+                    break;
             }
         }
 
@@ -246,6 +249,12 @@ namespace EDrinks.QueryHandlers
                 OrderId = ooos.OrderId,
                 MetaData = ooos.MetaData
             });
+        }
+
+        private void HandleEvent(SpendingClosed sc)
+        {
+            var spending = _dataContext.Spendings.First(e => e.Id == sc.SpendingId);
+            spending.Quantity = 0;
         }
     }
 }
