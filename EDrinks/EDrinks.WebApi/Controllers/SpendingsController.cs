@@ -90,6 +90,17 @@ namespace EDrinks.WebApi.Controllers
             return Created($"/api/Orders/{orderId}", orderId);
         }
 
+        [HttpGet("{spendingId}/Orders")]
+        public async Task<IActionResult> GetOrdersOfSpending([FromRoute] Guid spendingId)
+        {
+            var result = await _mediator.Send(new GetOrdersOfSpendingQuery()
+            {
+                SpendingId = spendingId
+            });
+            
+            return ResultToResponse(result);
+        }
+
         [HttpPost("{spendingId}")]
         public async Task<IActionResult> DeleteSpending(Guid spendingId)
         {

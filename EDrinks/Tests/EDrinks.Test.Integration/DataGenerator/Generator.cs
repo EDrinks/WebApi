@@ -62,6 +62,20 @@ namespace EDrinks.Test.Integration.DataGenerator
             return orderId;
         }
 
+        public async Task<Guid> OrderOnSpending(Guid spendingId, int quantity = 1)
+        {
+            var orderId = Guid.NewGuid();
+            
+            await WriteToStream(new ProductOrderedOnSpending()
+            {
+                OrderId = orderId,
+                SpendingId = spendingId,
+                Quantity = quantity
+            });
+
+            return orderId;
+        }
+
         public async Task<Guid> CreateSettlement(IEnumerable<Guid> tabIds)
         {
             var settlementId = Guid.NewGuid();
