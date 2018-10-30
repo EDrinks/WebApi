@@ -14,6 +14,7 @@ using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Localization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
@@ -59,6 +60,11 @@ namespace EDrinks.WebApi
             services.AddMediatR(assemblies);
             
             ConfigureAuth(services);
+            
+            services.Configure<RequestLocalizationOptions>(options =>
+            {
+                options.DefaultRequestCulture = new RequestCulture("en-US");
+            });
 
             services.AddCors();
             services.AddMvc();
@@ -93,6 +99,7 @@ namespace EDrinks.WebApi
             app.UseCors(builder => builder.WithOrigins(origins.ToArray()).AllowAnyHeader().AllowAnyMethod());
 
             app.UseAuthentication();
+            app.UseRequestLocalization();
             app.UseMvc();
         }
     }
