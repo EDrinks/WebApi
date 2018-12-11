@@ -67,7 +67,25 @@ namespace EDrinks.Test.Integration.Endpoints.StatisticsController
             Assert.Contains(dataPoints, e => e.Value == 1);
         }
 
-        private async Task<HttpResponseMessage> CallEndpoint(Guid productId, DateTime start, DateTime end)
+        [Fact]
+        public async Task TestGetConsumptionBetweenAllProducts()
+        {
+            var tabOne = await _fixture.Generator.CreateTab();
+            var tabTwo = await _fixture.Generator.CreateTab();
+            var productOneId = await _fixture.Generator.CreateProduct();
+            var productTwoId = await _fixture.Generator.CreateProduct();
+
+            await _fixture.Generator.OrderOnTab(tabOne, productOneId);
+            await _fixture.Generator.OrderOnTab(tabTwo, productTwoId);
+
+            var response = await CallEndpoint(null, DateTime.Now.AddDays(-1), DateTime.Now);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            
+            var dataPoints = await Deserialize<List<DataPoint>>(response);
+            Assert.Contains(dataPoints, e => e.Value == 2); // two products ordered overall
+        }
+
+        private async Task<HttpResponseMessage> CallEndpoint(Guid? productId, DateTime start, DateTime end)
         {
             string dateFormat = "yyyy-MM-dd";
 

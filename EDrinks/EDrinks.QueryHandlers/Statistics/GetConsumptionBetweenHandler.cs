@@ -9,13 +9,13 @@ namespace EDrinks.QueryHandlers.Statistics
 {
     public class GetConsumptionBetweenQuery : IQueryRequest<List<DataPoint>>
     {
-        public Guid ProductId { get; set; }
+        public Guid? ProductId { get; set; }
 
         public DateTime Start { get; set; }
 
         public DateTime End { get; set; }
     }
-    
+
     public class GetConsumptionBetweenHandler : QueryHandler<GetConsumptionBetweenQuery, List<DataPoint>>
     {
         private readonly IDataContext _dataContext;
@@ -43,15 +43,16 @@ namespace EDrinks.QueryHandlers.Statistics
             {
                 var date = currentDate;
                 var quantity = _dataContext.AllOrders
-                    .Where(e => e.DateTime.Date == date && e.ProductId == request.ProductId)
+                    .Where(e => e.DateTime.Date == date &&
+                                (request.ProductId == null || e.ProductId == request.ProductId))
                     .Sum(e => e.Quantity);
-                
+
                 dataPoints.Add(new DataPoint()
                 {
                     Label = date.ToString("yyyy-MM-dd"),
                     Value = quantity
                 });
-                
+
                 currentDate = currentDate.AddDays(1);
             }
 
