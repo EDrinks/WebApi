@@ -9,7 +9,7 @@ namespace EDrinks.QueryHandlers.Statistics
 {
     public class GetTopTenQuery : IQueryRequest<List<DataPoint>>
     {
-        public Guid ProductId { get; set; }
+        public Guid? ProductId { get; set; }
 
         public bool Current { get; set; }
     }
@@ -27,7 +27,8 @@ namespace EDrinks.QueryHandlers.Statistics
         {
             var orderCollection = request.Current ? _dataContext.CurrentOrders : _dataContext.AllOrders;
             
-            var topTen = orderCollection.Where(e => e.ProductId == request.ProductId)
+            var topTen = orderCollection
+                .Where(e => request.ProductId == null || e.ProductId == request.ProductId)
                 .GroupBy(e => e.TabId)
                 .Select(e => new DataPoint()
                 {

@@ -17,7 +17,7 @@ namespace EDrinks.WebApi.Controllers
         }
 
         [HttpGet("TopTen")]
-        public async Task<IActionResult> GetTopTenCurrent([FromQuery] Guid productId, [FromQuery] bool current = true)
+        public async Task<IActionResult> GetTopTenCurrent([FromQuery] Guid? productId, [FromQuery] bool current = true)
         {
             var result = await _mediator.Send(new GetTopTenQuery()
             {
