@@ -30,13 +30,14 @@ namespace EDrinks.WebApi.Controllers
 
         [HttpGet("ConsumptionBetween")]
         public async Task<IActionResult> GetConsumptionBetween([FromQuery] Guid? productId, [FromQuery] DateTime start,
-            [FromQuery] DateTime end)
+            [FromQuery] DateTime end, bool perDay)
         {
             var result = await _mediator.Send(new GetConsumptionBetweenQuery()
             {
                 ProductId = productId,
                 Start = start,
-                End = end
+                End = end,
+                PerDay = perDay
             });
 
             return ResultToResponse(result);
