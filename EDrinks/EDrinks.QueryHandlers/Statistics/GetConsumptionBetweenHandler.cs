@@ -43,17 +43,18 @@ namespace EDrinks.QueryHandlers.Statistics
             {
                 var date = currentDate;
                 var quantity = _dataContext.AllOrders
-                    .Where(e => e.DateTime.Date == date &&
+                    .Where(e => (e.DateTime >= date && e.DateTime < date.AddHours(1)) &&
                                 (request.ProductId == null || e.ProductId == request.ProductId))
                     .Sum(e => e.Quantity);
 
                 dataPoints.Add(new DataPoint()
                 {
-                    Label = date.ToString("yyyy-MM-dd"),
+                    Label = date.ToString("yyyy-MM-dd HH:mm")
+                            + "-" + date.AddHours(1).ToString("HH:mm"),
                     Value = quantity
                 });
 
-                currentDate = currentDate.AddDays(1);
+                currentDate = currentDate.AddHours(1);
             }
 
             return Ok(dataPoints);
