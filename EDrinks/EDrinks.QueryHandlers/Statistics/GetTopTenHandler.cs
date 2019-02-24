@@ -32,7 +32,7 @@ namespace EDrinks.QueryHandlers.Statistics
                 .GroupBy(e => e.TabId)
                 .Select(e => new DataPoint()
                 {
-                    Label = _dataContext.Tabs.First(tab => tab.Id == e.Key).Name,
+                    Label = _dataContext.Tabs.FirstOrDefault(tab => tab.Id == e.Key)?.Name ?? "???",
                     Value = e.Sum(o => o.Quantity)
                 })
                 .OrderByDescending(e => e.Value)
