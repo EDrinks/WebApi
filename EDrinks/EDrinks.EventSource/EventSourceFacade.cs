@@ -9,13 +9,6 @@ using Newtonsoft.Json;
 
 namespace EDrinks.EventSource
 {
-    public interface IEventSourceFacade
-    {
-        Task WriteEvent(BaseEvent evt);
-
-        Task WriteEvents(IEnumerable<BaseEvent> evts);
-    }
-
     public class EventSourceFacade : IEventSourceFacade
     {
         private readonly IEventLookup _eventLookup;

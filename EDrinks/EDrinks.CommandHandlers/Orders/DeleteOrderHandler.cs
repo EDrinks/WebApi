@@ -1,8 +1,8 @@
 using System;
 using System.Threading.Tasks;
 using EDrinks.Common;
+using EDrinks.Events;
 using EDrinks.Events.Orders;
-using EDrinks.EventSource;
 
 namespace EDrinks.CommandHandlers.Orders
 {

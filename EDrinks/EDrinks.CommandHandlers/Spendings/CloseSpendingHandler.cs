@@ -1,8 +1,8 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using EDrinks.Events;
 using EDrinks.Events.Spendings;
-using EDrinks.EventSource;
 using MediatR;
 
 namespace EDrinks.CommandHandlers.Spendings
