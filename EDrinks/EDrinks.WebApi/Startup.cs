@@ -6,7 +6,6 @@ using EDrinks.Common;
 using EDrinks.Common.Config;
 using EDrinks.Events;
 using EDrinks.EventSource;
-using EDrinks.EventSourceSql.Model;
 using EDrinks.QueryHandlers;
 using EDrinks.QueryHandlers.Model;
 using EDrinks.WebApi.Services;
@@ -16,9 +15,9 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Localization;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Serilog;
 
 namespace EDrinks.WebApi
@@ -69,7 +68,7 @@ namespace EDrinks.WebApi
             });
 
             services.AddCors();
-            services.AddMvc();
+            services.AddControllers();
             services.AddHttpContextAccessor();
         }
 
@@ -89,7 +88,7 @@ namespace EDrinks.WebApi
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
             {
@@ -100,9 +99,14 @@ namespace EDrinks.WebApi
             Configuration.GetSection("AppSettings").GetSection("AllowedOrigins").Bind(origins);
             app.UseCors(builder => builder.WithOrigins(origins.ToArray()).AllowAnyHeader().AllowAnyMethod());
 
+            app.UseRouting();
             app.UseAuthentication();
+            app.UseAuthorization();
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapControllers();
+            });
             app.UseRequestLocalization();
-            app.UseMvc();
         }
     }
 }
