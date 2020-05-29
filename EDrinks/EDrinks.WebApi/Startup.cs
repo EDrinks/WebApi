@@ -51,7 +51,7 @@ namespace EDrinks.WebApi
 
                 return connection;
             });
-            services.AddScoped<IEventSourceFacade, EventSourceFacade>();
+            services.AddScoped<IEventSourceFacade, EDrinks.EventSourceSql.EventSourceFacade>();
             services.AddScoped<IReadModel, ReadModel>();
             services.AddScoped<IDataContext, DataContext>();
             services.AddSingleton<IEventLookup, EventLookup>();

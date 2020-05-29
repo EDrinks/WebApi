@@ -11,6 +11,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\EDrinks.Common\EDrinks.Common.csproj" />
+      <ProjectReference Include="..\EDrinks.Events\EDrinks.Events.csproj" />
     </ItemGroup>
 
 </Project>
