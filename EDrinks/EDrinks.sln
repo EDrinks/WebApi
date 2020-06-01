@@ -22,6 +22,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EDrinks.Helper.DataFiller",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EDrinks.EventSourceSql", "EDrinks.EventSourceSql\EDrinks.EventSourceSql.csproj", "{F547C1C1-13B5-414C-AD7D-97CE21E8F424}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EdrinksDataMigration", "EdrinksDataMigration\EdrinksDataMigration.csproj", "{165A1C5E-CEF8-41B1-98F7-1E9BF8B31EA6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -64,6 +66,10 @@ Global
 		{F547C1C1-13B5-414C-AD7D-97CE21E8F424}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F547C1C1-13B5-414C-AD7D-97CE21E8F424}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F547C1C1-13B5-414C-AD7D-97CE21E8F424}.Release|Any CPU.Build.0 = Release|Any CPU
+		{165A1C5E-CEF8-41B1-98F7-1E9BF8B31EA6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{165A1C5E-CEF8-41B1-98F7-1E9BF8B31EA6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{165A1C5E-CEF8-41B1-98F7-1E9BF8B31EA6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{165A1C5E-CEF8-41B1-98F7-1E9BF8B31EA6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{05D039AF-D7B8-4F7F-BFA2-0C0E5C45F75C} = {1ECC6841-B088-4A9D-B114-9862F99D0A04}
