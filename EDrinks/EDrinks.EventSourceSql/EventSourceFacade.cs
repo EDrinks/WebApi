@@ -1,14 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using EDrinks.Common;
 using EDrinks.Events;
 using EDrinks.EventSourceSql.Model;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 
 namespace EDrinks.EventSourceSql
@@ -18,42 +16,15 @@ namespace EDrinks.EventSourceSql
         private readonly IStreamResolver _streamResolver;
         private readonly DomainContext _context;
 
-        public EventSourceFacade(IStreamResolver streamResolver, IConfiguration configuration)
+        public EventSourceFacade(IStreamResolver streamResolver, IDatabaseLookup databaseLookup)
         {
             _streamResolver = streamResolver;
 
-            var dbBaseDirectory = configuration.GetValue<string>("Data:BaseDir");
-            var systemDb = configuration.GetValue<string>("Data:SystemDb");
-            var systemDbPath = Path.Join(dbBaseDirectory, systemDb);
-
-            var systemOptions = new DbContextOptionsBuilder<SystemContext>()
-                .UseSqlite($"Data Source={systemDbPath}")
-                .Options;
-            var systemContext = new SystemContext(systemOptions);
-            systemContext.Database.EnsureCreated();
-
-            var userId = _streamResolver.GetStream();
-            var user = systemContext.Users.FirstOrDefault(e => e.AuthIdentifier == userId);
-            string dbPath = "";
-            if (user == null)
-            {
-                user = new User()
-                {
-                    AuthIdentifier = userId,
-                    EventDbFile = "events_" + CreateMD5(userId) + ".db"
-                };
-                systemContext.Users.Add(user);
-                systemContext.SaveChanges();
-            }
-
-            dbPath = Path.Join(dbBaseDirectory, user.EventDbFile);
-
+            var dbPath = databaseLookup.GetDatabase(streamResolver.GetStream());
             var options = new DbContextOptionsBuilder<DomainContext>()
                 .UseSqlite($"Data Source={dbPath}")
                 .Options;
-
             _context = new DomainContext(options);
-            _context.Database.EnsureCreated();
         }
 
         public async Task WriteEvent(BaseEvent evt)
@@ -69,6 +40,7 @@ namespace EDrinks.EventSourceSql
                 {
                     CreatedOn = DateTime.UtcNow,
                     CreatedBy = "system",
+                    EventType = evt.GetType().Name,
                     Content = JsonConvert.SerializeObject(evt)
                 });
             }
@@ -79,9 +51,9 @@ namespace EDrinks.EventSourceSql
         private static string CreateMD5(string input)
         {
             // Use input string to calculate MD5 hash
-            using (System.Security.Cryptography.MD5 md5 = System.Security.Cryptography.MD5.Create())
+            using (MD5 md5 = MD5.Create())
             {
-                byte[] inputBytes = System.Text.Encoding.ASCII.GetBytes(input);
+                byte[] inputBytes = Encoding.ASCII.GetBytes(input);
                 byte[] hashBytes = md5.ComputeHash(inputBytes);
 
                 // Convert the byte array to hexadecimal string

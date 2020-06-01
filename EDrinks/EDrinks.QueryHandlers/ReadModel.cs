@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using EDrinks.Common;
@@ -9,8 +10,10 @@ using EDrinks.Events.Orders;
 using EDrinks.Events.Products;
 using EDrinks.Events.Spendings;
 using EDrinks.Events.Tabs;
+using EDrinks.EventSourceSql;
+using EDrinks.EventSourceSql.Model;
 using EDrinks.QueryHandlers.Model;
-using EventStore.ClientAPI;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 
 namespace EDrinks.QueryHandlers
@@ -24,24 +27,29 @@ namespace EDrinks.QueryHandlers
 
     public class ReadModel : IReadModel
     {
-        private readonly IEventStoreConnection _connection;
         private readonly IStreamResolver _streamResolver;
         private readonly IEventLookup _eventLookup;
         private readonly IDataContext _dataContext;
+        private readonly DomainContext _context;
 
         private bool _eventsLoaded = false;
 
         private List<Action<BaseEvent>> _eventHandlers;
 
-        public ReadModel(IEventStoreConnection connection, IStreamResolver streamResolver, IEventLookup eventLookup,
-            IDataContext dataContext)
+        public ReadModel(IStreamResolver streamResolver, IEventLookup eventLookup,
+            IDataContext dataContext, IDatabaseLookup databaseLookup)
         {
-            _connection = connection;
             _streamResolver = streamResolver;
             _eventLookup = eventLookup;
             _dataContext = dataContext;
 
             _eventHandlers = new List<Action<BaseEvent>>();
+
+            var eventDbFile = databaseLookup.GetDatabase(streamResolver.GetStream());
+            var options = new DbContextOptionsBuilder<DomainContext>()
+                .UseSqlite($"Data Source={eventDbFile}")
+                .Options;
+            _context = new DomainContext(options);
         }
 
         public void RegisterHandler(Action<BaseEvent> handler)
@@ -53,29 +61,14 @@ namespace EDrinks.QueryHandlers
         {
             if (_eventsLoaded) return;
 
-            var events = new List<ResolvedEvent>();
-
-            StreamEventsSlice currentSlice;
-            var stream = _streamResolver.GetStream();
-            var nextSliceStart = (long) StreamPosition.Start;
-            do
+            foreach (var resolvedEvent in _context.DomainEvents.OrderBy(e => e.Id))
             {
-                currentSlice = await _connection.ReadStreamEventsForwardAsync(stream,
-                    nextSliceStart, 200, false);
-                nextSliceStart = currentSlice.NextEventNumber;
-
-                events.AddRange(currentSlice.Events);
-            } while (!currentSlice.IsEndOfStream);
-
-            foreach (var resolvedEvent in events)
-            {
-                var data = Encoding.UTF8.GetString(resolvedEvent.Event.Data);
-                var metaData = Encoding.UTF8.GetString(resolvedEvent.Event.Metadata);
-                Type eventType = _eventLookup.GetType(resolvedEvent.Event.EventType);
+                Type eventType = _eventLookup.GetType(resolvedEvent.EventType);
                 if (eventType != null)
                 {
-                    var obj = (BaseEvent) JsonConvert.DeserializeObject(data, eventType);
-                    obj.MetaData = JsonConvert.DeserializeObject<MetaData>(metaData);
+                    var obj = (BaseEvent) JsonConvert.DeserializeObject(resolvedEvent.Content, eventType);
+                    obj.MetaData.CreatedOn = resolvedEvent.CreatedOn;
+                    obj.MetaData.CreatedBy = resolvedEvent.CreatedBy;
                     await EventAppeared(obj);
 
                     foreach (var eventHandler in _eventHandlers)
@@ -200,7 +193,7 @@ namespace EDrinks.QueryHandlers
                 var spending = _dataContext.Spendings.First(e => e.Id == order.SpendingId);
                 spending.Current -= order.Quantity;
             }
-            
+
             _dataContext.CurrentOrders.RemoveAll(e => e.Id == od.OrderId);
             _dataContext.AllOrders.RemoveAll(e => e.Id == od.OrderId);
             foreach (var tabToOrders in _dataContext.CurrentSettlement.TabToOrders)
@@ -225,7 +218,7 @@ namespace EDrinks.QueryHandlers
         {
             var spending = _dataContext.Spendings.First(e => e.Id == poos.SpendingId);
             spending.Current += poos.Quantity;
-            
+
             // for settlements and everything just handle this as an normal order
             HandleEvent(new ProductOrderedOnTab()
             {
@@ -243,7 +236,7 @@ namespace EDrinks.QueryHandlers
             var order = _dataContext.CurrentOrders.First(e => e.Id == ooos.OrderId);
 
             spending.Current -= order.Quantity;
-            
+
             HandleEvent(new OrderDeleted()
             {
                 OrderId = ooos.OrderId,
@@ -255,6 +248,25 @@ namespace EDrinks.QueryHandlers
         {
             var spending = _dataContext.Spendings.First(e => e.Id == sc.SpendingId);
             spending.Quantity = 0;
+        }
+
+        private static string CreateMD5(string input)
+        {
+            // Use input string to calculate MD5 hash
+            using (MD5 md5 = MD5.Create())
+            {
+                byte[] inputBytes = Encoding.ASCII.GetBytes(input);
+                byte[] hashBytes = md5.ComputeHash(inputBytes);
+
+                // Convert the byte array to hexadecimal string
+                StringBuilder sb = new StringBuilder();
+                for (int i = 0; i < hashBytes.Length; i++)
+                {
+                    sb.Append(hashBytes[i].ToString("X2"));
+                }
+
+                return sb.ToString();
+            }
         }
     }
 }

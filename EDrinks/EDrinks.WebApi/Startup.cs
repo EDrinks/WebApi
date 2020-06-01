@@ -5,7 +5,7 @@ using System.Reflection;
 using EDrinks.Common;
 using EDrinks.Common.Config;
 using EDrinks.Events;
-using EDrinks.EventSource;
+using EDrinks.EventSourceSql;
 using EDrinks.QueryHandlers;
 using EDrinks.QueryHandlers.Model;
 using EDrinks.WebApi.Services;
@@ -51,10 +51,12 @@ namespace EDrinks.WebApi
 
                 return connection;
             });
-            services.AddScoped<IEventSourceFacade, EDrinks.EventSourceSql.EventSourceFacade>();
+            services.AddScoped<IEventSourceFacade, EventSourceFacade>();
             services.AddScoped<IReadModel, ReadModel>();
             services.AddScoped<IDataContext, DataContext>();
             services.AddSingleton<IEventLookup, EventLookup>();
+            services.AddSingleton<IDatabaseLookup, DatabaseLookup>();
+            
 
             var assemblies = (new[] {"EDrinks.QueryHandlers", "EDrinks.CommandHandlers"})
                 .Select(assemblyName => Assembly.Load(assemblyName));

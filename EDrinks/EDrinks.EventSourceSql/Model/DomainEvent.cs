@@ -10,6 +10,8 @@ namespace EDrinks.EventSourceSql.Model
 
         public string CreatedBy { get; set; }
 
+        public string EventType { get; set; }
+
         public string Content { get; set; }
     }
 }
