@@ -13,13 +13,10 @@ namespace EDrinks.EventSourceSql
 {
     public class EventSourceFacade : IEventSourceFacade
     {
-        private readonly IStreamResolver _streamResolver;
         private readonly DomainContext _context;
 
         public EventSourceFacade(IStreamResolver streamResolver, IDatabaseLookup databaseLookup)
         {
-            _streamResolver = streamResolver;
-
             var dbPath = databaseLookup.GetDatabase(streamResolver.GetStream());
             var options = new DbContextOptionsBuilder<DomainContext>()
                 .UseSqlite($"Data Source={dbPath}")

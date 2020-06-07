@@ -27,7 +27,6 @@ namespace EDrinks.QueryHandlers
 
     public class ReadModel : IReadModel
     {
-        private readonly IStreamResolver _streamResolver;
         private readonly IEventLookup _eventLookup;
         private readonly IDataContext _dataContext;
         private readonly DomainContext _context;
@@ -39,7 +38,6 @@ namespace EDrinks.QueryHandlers
         public ReadModel(IStreamResolver streamResolver, IEventLookup eventLookup,
             IDataContext dataContext, IDatabaseLookup databaseLookup)
         {
-            _streamResolver = streamResolver;
             _eventLookup = eventLookup;
             _dataContext = dataContext;
 

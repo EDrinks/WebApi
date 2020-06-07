@@ -15,7 +15,7 @@ namespace EDrinks.Test.Integration.Endpoints.ProductsController
         }
 
         [Fact]
-        public async Task TestNonExistantProduct()
+        public async Task TestNonExistentProduct()
         {
             var response = await CallEndpoint(Guid.NewGuid());
             

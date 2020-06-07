@@ -9,6 +9,7 @@ using EDrinks.Events.Orders;
 using EDrinks.Events.Products;
 using EDrinks.Events.Spendings;
 using EDrinks.Events.Tabs;
+using EDrinks.EventSourceSql.Model;
 using EventStore.ClientAPI;
 using Newtonsoft.Json;
 
@@ -16,14 +17,12 @@ namespace EDrinks.Test.Integration.DataGenerator
 {
     public class Generator
     {
-        private readonly IEventStoreConnection _connection;
-        private readonly string _stream;
+        private readonly DomainContext _context;
         private Faker _faker;
 
-        public Generator(IEventStoreConnection connection, string stream)
+        public Generator(DomainContext context)
         {
-            _connection = connection;
-            _stream = stream;
+            _context = context;
             _faker = new Faker();
         }
 
@@ -65,7 +64,7 @@ namespace EDrinks.Test.Integration.DataGenerator
         public async Task<Guid> OrderOnSpending(Guid spendingId, int quantity = 1)
         {
             var orderId = Guid.NewGuid();
-            
+
             await WriteToStream(new ProductOrderedOnSpending()
             {
                 OrderId = orderId,
@@ -109,13 +108,15 @@ namespace EDrinks.Test.Integration.DataGenerator
 
         private async Task WriteToStream(BaseEvent evt)
         {
-            var metaDataStr = JsonConvert.SerializeObject(evt.MetaData);
-            var contentStr = JsonConvert.SerializeObject(evt);
+            await _context.DomainEvents.AddAsync(new DomainEvent()
+            {
+                CreatedOn = DateTime.UtcNow,
+                CreatedBy = "system",
+                EventType = evt.GetType().Name,
+                Content = JsonConvert.SerializeObject(evt)
+            });
+            await _context.SaveChangesAsync();
 
-            var eventData = new EventData(Guid.NewGuid(), evt.GetType().Name, true,
-                Encoding.UTF8.GetBytes(contentStr), Encoding.UTF8.GetBytes(metaDataStr));
-
-            await _connection.AppendToStreamAsync(_stream, ExpectedVersion.Any, eventData);
             Thread.Sleep(50);
         }
     }

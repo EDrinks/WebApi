@@ -333,3 +333,4 @@ ASALocalRun/
 *.Development.json
 logs/
 data/
+temp/

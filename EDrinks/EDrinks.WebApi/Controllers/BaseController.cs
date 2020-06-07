@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace EDrinks.WebApi.Controllers
 {
     [Authorize]
-    public class BaseController : Controller
+    public class BaseController : ControllerBase
     {
         protected IActionResult ResultToResponse(HandlerResult handlerResult)
         {

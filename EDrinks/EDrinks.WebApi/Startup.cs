@@ -1,15 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using System.Reflection;
 using EDrinks.Common;
-using EDrinks.Common.Config;
 using EDrinks.Events;
 using EDrinks.EventSourceSql;
 using EDrinks.QueryHandlers;
 using EDrinks.QueryHandlers.Model;
 using EDrinks.WebApi.Services;
-using EventStore.ClientAPI;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
@@ -38,32 +35,19 @@ namespace EDrinks.WebApi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.Configure<EventStoreConfig>(options => Configuration.GetSection("EventStore").Bind(options));
-
             services.AddScoped<IStreamResolver, StreamResolver>();
-            services.AddSingleton<IEventStoreConnection>(serviceProvider =>
-            {
-                var settings = ConnectionSettings.Create();
-                var connection = EventStoreConnection.Create(settings, new IPEndPoint(
-                    IPAddress.Parse(Configuration.GetValue<string>("EventStore:IPAddress")),
-                    Configuration.GetValue<int>("EventStore:Port")));
-                connection.ConnectAsync().Wait();
-
-                return connection;
-            });
             services.AddScoped<IEventSourceFacade, EventSourceFacade>();
             services.AddScoped<IReadModel, ReadModel>();
             services.AddScoped<IDataContext, DataContext>();
             services.AddSingleton<IEventLookup, EventLookup>();
             services.AddSingleton<IDatabaseLookup, DatabaseLookup>();
-            
 
             var assemblies = (new[] {"EDrinks.QueryHandlers", "EDrinks.CommandHandlers"})
                 .Select(assemblyName => Assembly.Load(assemblyName));
             services.AddMediatR(assemblies);
-            
+
             ConfigureAuth(services);
-            
+
             services.Configure<RequestLocalizationOptions>(options =>
             {
                 options.DefaultRequestCulture = new RequestCulture("en-US");
@@ -81,7 +65,6 @@ namespace EDrinks.WebApi
             {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                 options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-
             }).AddJwtBearer(options =>
             {
                 options.Authority = domain;
@@ -96,7 +79,7 @@ namespace EDrinks.WebApi
             {
                 app.UseDeveloperExceptionPage();
             }
-            
+
             var origins = new List<string>();
             Configuration.GetSection("AppSettings").GetSection("AllowedOrigins").Bind(origins);
             app.UseCors(builder => builder.WithOrigins(origins.ToArray()).AllowAnyHeader().AllowAnyMethod());
@@ -104,10 +87,7 @@ namespace EDrinks.WebApi
             app.UseRouting();
             app.UseAuthentication();
             app.UseAuthorization();
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapControllers();
-            });
+            app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
             app.UseRequestLocalization();
         }
     }
