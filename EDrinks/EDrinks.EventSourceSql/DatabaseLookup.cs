@@ -1,8 +1,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Security.Cryptography;
-using System.Text;
+using EDrinks.Common;
 using EDrinks.EventSourceSql.Model;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -69,7 +68,7 @@ namespace EDrinks.EventSourceSql
 
         private string CreateUserDb(string userId)
         {
-            var dbFile = "events_" + CreateMd5(userId) + ".db";
+            var dbFile = "events_" + HashUtil.CreateMd5(userId) + ".db";
 
             _systemContext.Users.Add(new User()
             {
@@ -88,25 +87,6 @@ namespace EDrinks.EventSourceSql
             domainContext.Database.EnsureCreated();
 
             return fullPath;
-        }
-
-        private static string CreateMd5(string input)
-        {
-            // Use input string to calculate MD5 hash
-            using (MD5 md5 = MD5.Create())
-            {
-                byte[] inputBytes = Encoding.ASCII.GetBytes(input);
-                byte[] hashBytes = md5.ComputeHash(inputBytes);
-
-                // Convert the byte array to hexadecimal string
-                StringBuilder sb = new StringBuilder();
-                for (int i = 0; i < hashBytes.Length; i++)
-                {
-                    sb.Append(hashBytes[i].ToString("X2"));
-                }
-
-                return sb.ToString();
-            }
         }
     }
 }

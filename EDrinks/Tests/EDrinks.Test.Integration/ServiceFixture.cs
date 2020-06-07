@@ -1,8 +1,8 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Net.Http;
-using System.Security.Cryptography;
-using System.Text;
+using EDrinks.Common;
 using EDrinks.EventSourceSql.Model;
 using EDrinks.Test.Integration.DataGenerator;
 using Microsoft.EntityFrameworkCore;
@@ -21,7 +21,7 @@ namespace EDrinks.Test.Integration
         {
             var factory = new CustomWebAppFactory();
             Client = factory.CreateClient();
-            
+
             var configuration = new ConfigurationBuilder()
                 .AddJsonFile("appsettings.json")
                 .Build();
@@ -32,53 +32,49 @@ namespace EDrinks.Test.Integration
                 Directory.CreateDirectory(dataDirectory);
             }
 
+            var userDbFileName = CreateSystemDb(configuration, dataDirectory);
+            CreateEventDb(dataDirectory, userDbFileName);
+        }
+
+        private string CreateSystemDb(IConfigurationRoot configuration, string dataDirectory)
+        {
             var systemDbFile = configuration.GetValue<string>("Data:SystemDb");
             var systemDbPath = Path.Join(dataDirectory, systemDbFile);
-            
+
             var options = new DbContextOptionsBuilder<SystemContext>()
                 .UseSqlite($"Data Source={systemDbPath}")
                 .Options;
 
             var systemContext = new SystemContext(options);
             systemContext.Database.EnsureCreated();
-            
+
             var resolver = new TestStreamResolver();
             var authId = resolver.GetStream();
-            var userDbFileName = CreateMd5(authId) + ".db";
-            systemContext.Users.Add(new User()
-            {
-                AuthIdentifier = authId,
-                EventDbFile = userDbFileName
-            });
-            systemContext.SaveChanges();
+            var userDbFileName = HashUtil.CreateMd5(authId) + ".db";
 
+            if (!systemContext.Users.Any(e => e.AuthIdentifier == authId))
+            {
+                systemContext.Users.Add(new User()
+                {
+                    AuthIdentifier = authId,
+                    EventDbFile = userDbFileName
+                });
+                systemContext.SaveChanges();
+            }
+
+            return userDbFileName;
+        }
+
+        private void CreateEventDb(string dataDirectory, string userDbFileName)
+        {
             var eventDbPath = Path.Join(dataDirectory, userDbFileName);
             var domainOptions = new DbContextOptionsBuilder<DomainContext>()
                 .UseSqlite($"Data Source={eventDbPath}")
                 .Options;
             Context = new DomainContext(domainOptions);
             Context.Database.EnsureCreated();
-            
+
             Generator = new Generator(Context);
-        }
-        
-        private static string CreateMd5(string input)
-        {
-            // Use input string to calculate MD5 hash
-            using (MD5 md5 = MD5.Create())
-            {
-                byte[] inputBytes = Encoding.ASCII.GetBytes(input);
-                byte[] hashBytes = md5.ComputeHash(inputBytes);
-
-                // Convert the byte array to hexadecimal string
-                StringBuilder sb = new StringBuilder();
-                for (int i = 0; i < hashBytes.Length; i++)
-                {
-                    sb.Append(hashBytes[i].ToString("X2"));
-                }
-
-                return sb.ToString();
-            }
         }
 
         public void Dispose()
