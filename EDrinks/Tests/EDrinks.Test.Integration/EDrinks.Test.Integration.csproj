@@ -12,11 +12,6 @@
     <DotNetCliToolReference Include="dotnet-xunit" Version="2.3.1" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="Microsoft.AspNetCore, Version=2.1.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60">
-      <HintPath>..\..\..\..\..\..\.nuget\packages\microsoft.aspnetcore\2.1.0\lib\netstandard2.0\Microsoft.AspNetCore.dll</HintPath>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\..\EDrinks.WebApi\EDrinks.WebApi.csproj" />
   </ItemGroup>
 </Project>
