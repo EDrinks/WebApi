@@ -9,8 +9,8 @@ namespace EDrinks.QueryHandlers.Tabs
     public class GetTabsQuery : IQueryRequest<List<Tab>>
     {
     }
-    
-    public class GetTabsHandler: QueryHandler<GetTabsQuery, List<Tab>>
+
+    public class GetTabsHandler : QueryHandler<GetTabsQuery, List<Tab>>
     {
         private readonly IDataContext _dataContext;
 
@@ -18,10 +18,10 @@ namespace EDrinks.QueryHandlers.Tabs
         {
             _dataContext = dataContext;
         }
-        
-        protected override async Task<HandlerResult<List<Tab>>> DoHandle(GetTabsQuery request)
+
+        protected override Task<HandlerResult<List<Tab>>> DoHandle(GetTabsQuery request)
         {
-            return Ok(_dataContext.Tabs.OrderBy(e => e.Name).ToList());
+            return Task.FromResult(Ok(_dataContext.Tabs.OrderBy(e => e.Name).ToList()));
         }
     }
 }

@@ -79,7 +79,7 @@ namespace EDrinks.QueryHandlers
             _eventsLoaded = true;
         }
 
-        private async Task EventAppeared(BaseEvent evt)
+        private Task EventAppeared(BaseEvent evt)
         {
             switch (evt)
             {
@@ -130,6 +130,8 @@ namespace EDrinks.QueryHandlers
                     HandleEvent(sc);
                     break;
             }
+
+            return Task.CompletedTask;
         }
 
         private void HandleEvent(ProductOrderedOnTab poot, Guid? spendingId = null)

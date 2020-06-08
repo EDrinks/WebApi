@@ -27,16 +27,16 @@ namespace EDrinks.QueryHandlers.Statistics
             _dataContext = dataContext;
         }
 
-        protected override async Task<HandlerResult<List<DataPoint>>> DoHandle(GetConsumptionBetweenQuery request)
+        protected override Task<HandlerResult<List<DataPoint>>> DoHandle(GetConsumptionBetweenQuery request)
         {
             if (request.Start > request.End)
             {
-                return Error("Start date must be smaller than end date");
+                return Task.FromResult(Error("Start date must be smaller than end date"));
             }
 
             if ((request.End - request.Start).Days > 90)
             {
-                return Error("Maximum of 90 days are allowed between start and end date");
+                return Task.FromResult(Error("Maximum of 90 days are allowed between start and end date"));
             }
 
             int hoursStepSize = request.PerDay ? 24 : 1;
@@ -63,7 +63,7 @@ namespace EDrinks.QueryHandlers.Statistics
                 currentDate = currentDate.AddHours(hoursStepSize);
             }
 
-            return Ok(dataPoints);
+            return Task.FromResult(Ok(dataPoints));
         }
 
         private string GetPerDayLabel(DateTime dateTime)

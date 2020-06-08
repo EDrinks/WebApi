@@ -29,10 +29,10 @@ namespace EDrinks.QueryHandlers.Settlements
             _dataContext = dataContext;
         }
         
-        protected override async Task<HandlerResult<List<Settlement>>> DoHandle(GetSettlementsQuery request)
+        protected override Task<HandlerResult<List<Settlement>>> DoHandle(GetSettlementsQuery request)
         {
             var errors = ValidateRequest(request);
-            if (errors.Any()) return Error(errors);
+            if (errors.Any()) return Task.FromResult(Error(errors));
 
             var settlements = _dataContext.Settlements
                 .OrderByDescending(e => e.DateTime)
@@ -41,7 +41,7 @@ namespace EDrinks.QueryHandlers.Settlements
                 .Take(request.PageSize)
                 .ToList();
 
-            return Ok(settlements);
+            return Task.FromResult(Ok(settlements));
         }
         
         private List<string> ValidateRequest(GetSettlementsQuery request)

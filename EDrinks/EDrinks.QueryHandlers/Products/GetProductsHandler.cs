@@ -19,9 +19,10 @@ namespace EDrinks.QueryHandlers.Products
             _dataContext = dataContext;
         }
 
-        protected override async Task<HandlerResult<List<Product>>> DoHandle(GetProductsQuery request)
+        protected override Task<HandlerResult<List<Product>>> DoHandle(GetProductsQuery request)
         {
-            return Ok(_dataContext.Products.OrderBy(e => e.Name).ToList());
+            return Task.FromResult(Ok(_dataContext.Products.OrderBy(e => e.Name)
+                .ToList()));
         }
     }
 }

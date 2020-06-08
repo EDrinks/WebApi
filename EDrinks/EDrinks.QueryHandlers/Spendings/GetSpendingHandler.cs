@@ -20,11 +20,11 @@ namespace EDrinks.QueryHandlers.Spendings
             _dataContext = dataContext;
         }
 
-        protected override async Task<HandlerResult<Spending>> DoHandle(GetSpendingQuery request)
+        protected override Task<HandlerResult<Spending>> DoHandle(GetSpendingQuery request)
         {
             var spending = _dataContext.Spendings.FirstOrDefault(e => e.Id == request.SpendingId);
 
-            return spending != null ? Ok(spending) : NotFound();
+            return Task.FromResult(spending != null ? Ok(spending) : NotFound());
         }
     }
 }

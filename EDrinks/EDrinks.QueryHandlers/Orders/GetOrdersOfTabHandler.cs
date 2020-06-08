@@ -21,9 +21,10 @@ namespace EDrinks.QueryHandlers.Orders
             _dataContext = dataContext;
         }
 
-        protected override async Task<HandlerResult<List<Order>>> DoHandle(GetOrdersOfTabQuery request)
+        protected override Task<HandlerResult<List<Order>>> DoHandle(GetOrdersOfTabQuery request)
         {
-            return Ok(_dataContext.CurrentOrders.Where(e => e.TabId == request.TabId).ToList());
+            return Task.FromResult(Ok(_dataContext.CurrentOrders.Where(e => e.TabId == request.TabId)
+                .ToList()));
         }
     }
 }

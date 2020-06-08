@@ -10,7 +10,7 @@ namespace EDrinks.QueryHandlers.Products
     {
         public Guid Id { get; set; }
     }
-    
+
     public class GetProductHandler : QueryHandler<GetProductQuery, Product>
     {
         private readonly IDataContext _dataContext;
@@ -19,12 +19,12 @@ namespace EDrinks.QueryHandlers.Products
         {
             _dataContext = dataContext;
         }
-        
-        protected override async Task<HandlerResult<Product>> DoHandle(GetProductQuery request)
+
+        protected override Task<HandlerResult<Product>> DoHandle(GetProductQuery request)
         {
             var product = _dataContext.Products.FirstOrDefault(e => e.Id == request.Id);
 
-            return product != null ? Ok(product) : NotFound();
+            return Task.FromResult(product != null ? Ok(product) : NotFound());
         }
     }
 }

@@ -17,9 +17,9 @@ namespace EDrinks.QueryHandlers.Settlements
             _dataContext = dataContext;
         }
         
-        protected override async Task<HandlerResult<Settlement>> DoHandle(GetCurrentSettlementQuery request)
+        protected override Task<HandlerResult<Settlement>> DoHandle(GetCurrentSettlementQuery request)
         {
-            return Ok(_dataContext.CurrentSettlement);
+            return Task.FromResult(Ok(_dataContext.CurrentSettlement));
         }
     }
 }

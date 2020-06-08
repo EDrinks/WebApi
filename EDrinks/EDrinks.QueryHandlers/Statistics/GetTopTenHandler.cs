@@ -23,7 +23,7 @@ namespace EDrinks.QueryHandlers.Statistics
             _dataContext = dataContext;
         }
 
-        protected override async Task<HandlerResult<List<DataPoint>>> DoHandle(GetTopTenQuery request)
+        protected override Task<HandlerResult<List<DataPoint>>> DoHandle(GetTopTenQuery request)
         {
             var orderCollection = request.Current ? _dataContext.CurrentOrders : _dataContext.AllOrders;
             
@@ -39,7 +39,7 @@ namespace EDrinks.QueryHandlers.Statistics
                 .Take(10)
                 .ToList();
             
-            return Ok(topTen);
+            return Task.FromResult(Ok(topTen));
         }
     }
 }

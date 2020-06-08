@@ -20,16 +20,16 @@ namespace EDrinks.QueryHandlers.Tabs
             _dataContext = dataContext;
         }
         
-        protected override async Task<HandlerResult<Tab>> DoHandle(GetTabQuery request)
+        protected override Task<HandlerResult<Tab>> DoHandle(GetTabQuery request)
         {
             Tab tab = _dataContext.Tabs.FirstOrDefault(e => e.Id == request.TabId);
 
             if (tab == null)
             {
-                return NotFound();
+                return Task.FromResult(NotFound());
             }
 
-            return Ok(tab);
+            return Task.FromResult(Ok(tab));
         }
     }
 }

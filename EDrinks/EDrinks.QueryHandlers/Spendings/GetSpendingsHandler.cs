@@ -9,7 +9,7 @@ namespace EDrinks.QueryHandlers.Spendings
     public class GetSpendingsQuery : IQueryRequest<List<Spending>>
     {
     }
-    
+
     public class GetSpendingsHandler : QueryHandler<GetSpendingsQuery, List<Spending>>
     {
         private readonly IDataContext _dataContext;
@@ -19,9 +19,10 @@ namespace EDrinks.QueryHandlers.Spendings
             _dataContext = dataContext;
         }
 
-        protected override async Task<HandlerResult<List<Spending>>> DoHandle(GetSpendingsQuery request)
+        protected override Task<HandlerResult<List<Spending>>> DoHandle(GetSpendingsQuery request)
         {
-            return Ok(_dataContext.Spendings.Where(e => e.Current < e.Quantity).ToList());
+            return Task.FromResult(Ok(_dataContext.Spendings.Where(e => e.Current < e.Quantity)
+                .ToList()));
         }
     }
 }

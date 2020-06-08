@@ -18,9 +18,9 @@ namespace EDrinks.QueryHandlers.Orders
             _dataContext = dataContext;
         }
         
-        protected override async Task<HandlerResult<List<Order>>> DoHandle(GetCurrentOrdersQuery request)
+        protected override Task<HandlerResult<List<Order>>> DoHandle(GetCurrentOrdersQuery request)
         {
-            return Ok(_dataContext.CurrentOrders);
+            return Task.FromResult(Ok(_dataContext.CurrentOrders));
         }
     }
 }

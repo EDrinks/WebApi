@@ -20,11 +20,11 @@ namespace EDrinks.QueryHandlers.Settlements
             _dataContext = dataContext;
         }
         
-        protected override async Task<HandlerResult<Settlement>> DoHandle(GetSettlementQuery request)
+        protected override Task<HandlerResult<Settlement>> DoHandle(GetSettlementQuery request)
         {
             var settlement = _dataContext.Settlements.FirstOrDefault(e => e.Id == request.SettlementId);
 
-            return settlement == null ? NotFound() : Ok(settlement);
+            return Task.FromResult(settlement == null ? NotFound() : Ok(settlement));
         }
     }
 }

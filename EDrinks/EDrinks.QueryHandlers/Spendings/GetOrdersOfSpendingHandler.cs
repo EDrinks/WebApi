@@ -21,15 +21,15 @@ namespace EDrinks.QueryHandlers.Spendings
             _dataContext = dataContext;
         }
 
-        protected override async Task<HandlerResult<List<Order>>> DoHandle(GetOrdersOfSpendingQuery request)
+        protected override Task<HandlerResult<List<Order>>> DoHandle(GetOrdersOfSpendingQuery request)
         {
             if (_dataContext.Spendings.All(e => e.Id != request.SpendingId))
             {
-                return NotFound();
+                return Task.FromResult(NotFound());
             }
             
             var orders = _dataContext.AllOrders.Where(e => e.SpendingId == request.SpendingId).ToList();
-            return Ok(orders);
+            return Task.FromResult(Ok(orders));
         }
     }
 }
