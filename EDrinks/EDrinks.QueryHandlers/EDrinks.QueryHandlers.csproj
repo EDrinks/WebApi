@@ -4,7 +4,6 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\EDrinks.EventSourceSql\EDrinks.EventSourceSql.csproj" />
-    <ProjectReference Include="..\EDrinks.EventSource\EDrinks.EventSource.csproj" />
     <ProjectReference Include="..\EDrinks.Events\EDrinks.Events.csproj" />
   </ItemGroup>
   <ItemGroup>

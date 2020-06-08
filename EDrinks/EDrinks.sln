@@ -6,8 +6,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EDrinks.Events", "EDrinks.E
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EDrinks.CommandHandlers", "EDrinks.CommandHandlers\EDrinks.CommandHandlers.csproj", "{CD222DF2-C7EE-4635-A961-5535BC5F6F5C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EDrinks.EventSource", "EDrinks.EventSource\EDrinks.EventSource.csproj", "{045F5D71-7581-43C3-9E23-408A21898346}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EDrinks.Common", "EDrinks.Common\EDrinks.Common.csproj", "{E0C1B4BB-9231-400D-A7E1-2D64792B6FC9}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EDrinks.QueryHandlers", "EDrinks.QueryHandlers\EDrinks.QueryHandlers.csproj", "{A8FEC45E-BBD3-4149-A61F-55CE04A4DC99}"
@@ -42,10 +40,6 @@ Global
 		{CD222DF2-C7EE-4635-A961-5535BC5F6F5C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CD222DF2-C7EE-4635-A961-5535BC5F6F5C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CD222DF2-C7EE-4635-A961-5535BC5F6F5C}.Release|Any CPU.Build.0 = Release|Any CPU
-		{045F5D71-7581-43C3-9E23-408A21898346}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{045F5D71-7581-43C3-9E23-408A21898346}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{045F5D71-7581-43C3-9E23-408A21898346}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{045F5D71-7581-43C3-9E23-408A21898346}.Release|Any CPU.Build.0 = Release|Any CPU
 		{E0C1B4BB-9231-400D-A7E1-2D64792B6FC9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{E0C1B4BB-9231-400D-A7E1-2D64792B6FC9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E0C1B4BB-9231-400D-A7E1-2D64792B6FC9}.Release|Any CPU.ActiveCfg = Release|Any CPU

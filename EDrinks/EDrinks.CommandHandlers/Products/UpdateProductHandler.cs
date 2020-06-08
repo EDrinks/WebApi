@@ -3,7 +3,6 @@ using System.Threading.Tasks;
 using EDrinks.Common;
 using EDrinks.Events;
 using EDrinks.Events.Products;
-using EDrinks.EventSource;
 
 namespace EDrinks.CommandHandlers.Products
 {

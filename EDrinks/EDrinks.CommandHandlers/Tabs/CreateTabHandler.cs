@@ -3,7 +3,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using EDrinks.Events;
 using EDrinks.Events.Tabs;
-using EDrinks.EventSource;
 using MediatR;
 
 namespace EDrinks.CommandHandlers.Tabs
